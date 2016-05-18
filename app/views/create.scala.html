@@ -1,0 +1,23 @@
+@*
+ * This template takes a single argument, a String containing a
+ * message to display.
+ *@
+@(message: String)
+
+@*
+ * Call the the `main` template with two arguments. The first
+ * argument is a `String` with the title of the page, the second
+ * argument is an `Html` object containing the body of the page.
+ *@
+@main("create a dataset") {
+<form action="/load"> 
+ <h2>Create</h2>			
+  <button class="button" type="submit" onclick="load" id="create" value="">
+	<span>Create</span>
+  </button>			
+  <button class="button" type="submit" onclick="#" id="edit">
+	<span>Edit</span>
+  </button>
+</form>
+	
+}

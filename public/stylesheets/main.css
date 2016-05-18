@@ -1,0 +1,55 @@
+.button {
+   background-color: #4CAF50 ;
+   border: none;
+   color: white;
+   padding: 15px 32px;
+   text-align: center;
+   text-decoration: none;
+   display: inline-block;
+   font-size: 16px;
+   margin: 4px 2px;
+   cursor: pointer;
+}
+inputs:-webkit-input-placeholder {
+   color: #b5b5b5 ;
+}
+inputs-moz-placeholder {
+   color: #b5b5b5 ;
+}
+.inputs {
+   margin-top: 10px;	
+   width: 270px;
+   padding: 15px 25px;
+   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+   font-weight: 400;
+   font-size: 14px;
+   color: #9D9E9E ;
+   text-shadow: 1px 1px 0 rgba(256, 256, 256, 1.0);
+   background: #FFF;
+   border: 1px solid #FFF;
+   border-radius: 5px;
+   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50);
+   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50);
+   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50);
+}
+.inputs:focus {
+   background: #DFE9EC ;
+   color: #414848 ;
+   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+   -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+   -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+   outline: 0;
+}
+.inputs:hover {
+   background: #DFE9EC ;
+   color: #414848 ;
+}
+dt label{	
+	margin-left: 45px;	
+}
+.load{
+	margin-left: 38px;
+}
+.error {
+  color: red;  
+}

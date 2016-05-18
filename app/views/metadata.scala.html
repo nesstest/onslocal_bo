@@ -1,0 +1,25 @@
+@*
+ * This template takes a single argument, a String containing a
+ * message to display.(message:String)
+ *@
+@(metaForm:Form[Metadata])
+
+@import helper._
+
+@*
+ * Call the the `main` template with two arguments. The first
+ * argument is a `String` with the title of the page, the second
+ * argument is an `Html` object containing the body of the page.
+ *@
+@main("Import DCAT metadata from JSON") {
+<h1>Give Me De Cat</h1>
+<img src="/assets/images/dougal.png"/>
+<br/> 
+    @form(action=routes.MetadataController.processform()) {
+       @inputText(metaForm("dsname"))
+       @inputText(metaForm("dimdsid"))
+       @textarea(field = metaForm("json"), args = 'rows -> 12, 'cols -> 50)
+       <input type="submit" value="Submit">
+    }
+
+}
