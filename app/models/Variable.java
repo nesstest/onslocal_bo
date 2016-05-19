@@ -15,6 +15,8 @@ public class Variable implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+    @SequenceGenerator( name = "varseq", sequenceName = "varseq", allocationSize = 1, initialValue = 1 )
+    @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "varseq" )
 	@Column(name="variable_id")
 	private Long variableId;
 

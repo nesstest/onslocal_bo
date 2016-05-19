@@ -16,6 +16,8 @@ public class GeographicArea implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+    @SequenceGenerator( name = "areaseq", sequenceName = "areaseq", allocationSize = 1, initialValue = 1 )
+    @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "areaseq" )
 	@Column(name="geographic_area_id")
 	private Long geographicAreaId;
 

@@ -17,6 +17,8 @@ public class TimePeriod implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+    @SequenceGenerator( name = "timeseq", sequenceName = "timeseq", allocationSize = 1, initialValue = 1 )
+    @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "timeseq" )
 	@Column(name="time_period_id")
 	private Long timePeriodId;
 

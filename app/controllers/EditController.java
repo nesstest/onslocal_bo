@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import javax.inject.*;
 import javax.persistence.EntityManager;
 
-import services.MetadataParser;
+import services.LoadToTarget;
 import play.db.jpa.JPAApi;
 import play.db.jpa.Transactional;
 /**
@@ -38,11 +38,26 @@ public class EditController extends Controller {
     	task = ed1.getTask();
     	dsname = ed1.getDsname();
     	dimdsid = ed1.getDimdsid();
-    //	String fullPath = "C:\\Users\\Admin\\Documents\\ILCH\\" + filename;
- //   	MetadataParser mp = new MetadataParser(ed1);
+    	
+    	LoadToTarget lot = new LoadToTarget(ed1);
+/*    	
+For each staged dimensional data point matching the current dimensional data set id...
+    	
+    	1. Create a skeleton dimensional data point record in memory
+    	2. Fetch the staged category records for current observation seq id
+    	3. For each staged category record
+    		3.1. Try to fetch the concept id, if not found create new concept
+    		3.2. Try to fetch the category id, if not found create new category
+    	4. If no new items created in 3.1 and 3.2, fetch the variable id for the combo, else create a variable and a set of variablecategory records for it
+    	5. Try to fetch the geographic area id by extcode, if not found create new geographic area and derive area and level types via lookup on first three digits of extcode
+    	6. Try to fetch a time id for the current time code. If not found create a new time_period entry.
+    	7. Try to find a population record for the current area / time combo, if not found create a new one for it
+    	8. we should now have all the required ids populated and can do a "persist" on the data.
+*/
+
 		EntityManager em = jpaApi.em();
-  //      mp.runJPA(em);
-		
+        lot.runJPA(em);
+	
 		
     return ok(dsname + " " + dimdsid + " " + task );
     //	 ValidationError e = new ValidationError("name", "dataset already exist",new ArrayList());
