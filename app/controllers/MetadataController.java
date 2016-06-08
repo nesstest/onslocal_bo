@@ -27,7 +27,7 @@ public class MetadataController extends Controller {
 	FormFactory formFactory;
 	
 	private String json;
-    private String dsname;
+  //  private String dsname;
     private Long dimdsid;
 	
 	@Inject
@@ -50,7 +50,7 @@ public class MetadataController extends Controller {
     	//Metadata met1 = metaForm.bindFromRequest().get();
     
     	json = met1.getJson();
-    	dsname = met1.getDsname();
+    //	dsname = met1.getDsname();
     	dimdsid = met1.getDimdsid();
     //	String fullPath = "C:\\Users\\Admin\\Documents\\ILCH\\" + filename;
     	MetadataParser mp = new MetadataParser(met1);
@@ -67,7 +67,7 @@ public class MetadataController extends Controller {
     //	return badRequest;
    // 	return ok (ds1.getStatus());
     
-    return ok(views.html.message.render((dimdsid + " loaded"), Html.apply("<p>Dataset id: " + dimdsid + "<br/>Dataset title: " + dsname + "<br/>JSON: " + json + "</p>")));
+    return ok(views.html.message.render(("Dataset " + dimdsid + " loaded"), Html.apply("<p>Dataset id: " + dimdsid + "<br/>JSON: " + json + "</p>")));
  }
     
     }

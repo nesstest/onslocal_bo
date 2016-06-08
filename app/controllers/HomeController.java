@@ -47,7 +47,7 @@ public class HomeController extends Controller {
     public Result metadata() {
     	Form<Metadata> metaForm = formFactory.form(Metadata.class);
     	Metadata m1 = new Metadata();
-    	m1.setDsname("TEST1");
+   // 	m1.setDsname("TEST1");
     	m1.setDimdsid(11L);
         return ok(views.html.metadata.render(metaForm.fill(m1)));
    // 	return ok(load.render("Choose a dataset to load."));

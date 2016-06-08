@@ -25,10 +25,6 @@
 	    <input class="inputs" type="text" value="" size="10" autocomplete="off" name="@name" id="@id" placeholder="Dataset ID" @toHtmlArgs(args)>
 	   }
 	   
-	   @helper.input(metaForm("dsname"), '_label -> "Enter Dataset Title", '_class -> "form-field-pair") { (id, name, value, args) =>
-	    <input class="inputs" type="text" autocomplete="off" name="title" id="dsTitle" placeholder="Dataset Title" value="">
-	   } 
-	   
 	   @helper.input(metaForm("json"), '_label -> "Enter JSON metadata", '_class -> "form-field-pair") { (id, name, value, args) =>
 	    <textarea class="inputs" type="text" autocomplete="off" name="json" id="json" placeholder="JSON Metadata" value="" rows="12" cols="50"></textarea>
 	   } 

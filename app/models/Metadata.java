@@ -8,16 +8,10 @@ import java.util.regex.Pattern;
 import play.data.validation.ValidationError;
 
 public class Metadata {
-	  private String dsname;
 	  private Long dimdsid;
 	  private String json;
+	    private String status;
 	  
-	public String getDsname() {
-		return dsname;
-	}
-	public void setDsname(String dsname) {
-		this.dsname = dsname;
-	}
 	public Long getDimdsid() {
 		return dimdsid;
 	}
@@ -30,22 +24,18 @@ public class Metadata {
 	public void setJson(String json) {
 		this.json = json;
 	}
-
+	
    public List<ValidationError> validate() {
 
       List<ValidationError> errors = new ArrayList<ValidationError>();
       
-      Pattern pattern = Pattern.compile("^[a-zA-Z0-9]*$");            
-     
       if (dimdsid == null) {
         errors.add(new ValidationError("dimdsid", "No id was given."));
       }
-
-
-          if (dsname == null || dsname.length() == 0) {
-              errors.add(new ValidationError("dsname", "No title was given."));
-          }
-         
+      
+      if (json == null || json.length() == 0) {
+         errors.add(new ValidationError("json", "No JSON was given."));
+       }
       
       if(errors.size() > 0){
           return errors;
@@ -55,11 +45,4 @@ public class Metadata {
       }  
     }
 	
-   public boolean isAlphaNumeric(String s){
-      String pattern= "^[a-zA-Z0-9]*$";
-      if(s.matches(pattern)){
-        return true;
-      }
-      return false;   
-   }
 }
