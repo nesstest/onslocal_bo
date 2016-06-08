@@ -62,4 +62,8 @@ public class HomeController extends Controller {
         return ok(views.html.edit.render(editForm.fill(ed1)));
    // 	return ok(load.render("Choose a dataset to load."));
     }    
+    
+    public Result index() {
+       return ok(views.html.index.render("Welcome"));
+  }
 }

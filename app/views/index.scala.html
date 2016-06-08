@@ -10,12 +10,59 @@
  * argument is an `Html` object containing the body of the page.
  *@
 @main("Dougal At Your Service") {
-<h1>Dougal At Your Service</h1>
- <img src="/assets/images/dougal.png"/> 
-<h2>What is your command?</h2>
-<!--  <input type="button" value="Load Dataset" onclick="alert('I\'m not made of stone, you know, I\'m sensitive');"/>-->
-<ul>
-<li>
-<a href="load">LOAD NEW DATASET</a>
-</li></ul>
+
+<div class="content-highlight-container">
+	<div class="content-highlight">
+		<img src="/assets/images/dougal.png" class="img-left"/>
+		Dougal for Data<br/>Magic... in a roundabout sort of way
+		<br style="clear:both" />
+	</div>
+</div>
+<div class="content-box-nav">
+	<h1>Choose your pick</h1>
+	<article class="box-nav-item">
+		<a href="@routes.HomeController.load()">
+			<h2>Load Dataset</h2>
+			<p>Load a new dataset to the system</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.EditController.processform()">
+			<h2>Edit Dataset</h2>
+			<p>Edit an existing dataset</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.HomeController.metadata()">
+			<h2>Load Metadata</h2>
+			<p>Load metadata to the system</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.HomeController.load()">
+			<h2>View Status</h2>
+			<p>View system status</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.HomeController.load()">
+			<h2>Generate</h2>
+			<p>Play the generation game</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.HomeController.load()">
+			<h2>Publish</h2>
+			<p>Publish the dataset</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.HomeController.load()">
+			<h2>View Log</h2>
+			<p>View the system log</p>
+		</a>
+	</article>	
+	<br style="clear:both" />
+</div>
+
 }

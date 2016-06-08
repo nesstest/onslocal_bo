@@ -4,7 +4,9 @@
 
 # An example controller showing a sample home page
 
-GET     /                           controllers.HomeController.create
+GET     /	                        controllers.HomeController.index
+
+GET     /create                     controllers.HomeController.create
 
 GET     /load                       controllers.HomeController.load
 

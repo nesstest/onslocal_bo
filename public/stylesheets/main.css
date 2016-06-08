@@ -1,3 +1,171 @@
+/** * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/) * http://cssreset.com */html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, em, img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,time, mark, audio, video {	margin: 0;	padding: 0;	border: 0;	font-size: 100%;	font: inherit;	vertical-align: baseline;}/* HTML5 display-role reset for older browsers */article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {	display: block;}body {	line-height: 1;}ol, ul {	list-style: none;}blockquote, q {	quotes: none;}blockquote:before, blockquote:after,q:before, q:after {	content: '';	content: none;}table {	border-collapse: collapse;	border-spacing: 0;}
+
+body {
+	font-family: Helvetica,sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 24px;
+    color: #414042;
+	background-color: #EAEAEA;    
+}
+
+.header-container {
+	width:100%;
+}
+.brand-container {
+	width:100%;
+	background-color: #fff;	
+}
+.brand {
+	width: 900px;
+	margin:0 auto;
+	padding: 15px 0;
+	height: 39px;
+}
+.brand-logo{
+	width: 240px;
+	float:left;
+}
+.brand-logo img {
+	height: 39px;
+}
+.brand-title {
+	font-size:30px;
+	text-align:right;
+	width: 660px;
+	float:left;
+	line-height: 39px;
+}
+.nav-container {
+	width:100%;
+	background-color: #58595B;
+	clear:left;
+}
+nav {
+	width: 900px;
+	margin:0 auto;
+	color: #E5E6E7;
+	height: 34px;
+}
+nav ul li {
+	float:left;
+	font-size:16px;
+	padding: 5px 20px;
+}
+nav ul li a {
+	color: #E5E6E7;
+	text-decoration: none;
+}
+nav ul li a:hover {
+	color: #E5E6E7;
+	text-decoration: underline;
+}
+.content-container {
+	width:100%;
+	clear:left;
+	background-color: #EAEAEA;
+    color: #414042;	
+}
+.content {
+	width: 900px;
+	margin: 0 auto 20px auto;
+}
+.content h1 {
+	font-size: 24px;
+    font-weight: 300;
+    line-height: 24px;
+    margin: 40px 0 0 0;
+    padding: 3px 0 5px 0;
+}
+.content-highlight-container {
+	background-color: #3B7A9E;
+    color: #F0F1F1;
+    width: 100%;
+    padding: 20px 0;
+    margin: 0 0 20px 0;
+}
+.content-highlight {
+	width: 900px;
+	margin: 0 auto;
+	font-size: 36px;
+	line-height: 48px;
+}
+.content-box-nav {
+	width: 930px;
+	margin: 0 auto;	
+	padding: 0 0 20px 0;
+}
+.content-box-nav h1 {
+	font-size: 24px;
+    font-weight: 300;
+    line-height: 24px;
+    margin: 40px 15px 0 15px;
+    padding: 3px 0 5px 0;
+}
+.box-nav-item {
+	margin: 15px;
+	padding: 10px;
+	width: 260px;
+	height: 130px;
+	background-color: #fff;
+	float: left;
+}
+.box-nav-item a {
+	color: #206095;
+	text-decoration: none;
+}
+.box-nav-item a:hover {
+	text-decoration: underline;
+}
+.box-nav-item h2 {
+	font-size: 24px;
+	line-height: 36px;
+}
+.box-nav-item p {
+	font-size: 14px;
+}
+img.img-left {
+	float: left;
+	text-align:middle;
+	padding: 0 20px 0 0;
+}
+
+.footer-container {
+	width:100%;
+	background-color: #58595B;
+	clear:left;
+	min-height: 200px;
+}
+
+/* Form formatting */
+
+form {
+	margin: 0 0 20px 0;
+}
+.form-field-pair {
+	padding: 10px 0;
+	margin: 10px 0;
+}
+.form-field-pair dt {
+    float: left;
+    clear: left;
+    width: 200px;
+    text-align: right;
+	padding: 20px 0 0 0;
+}
+.form-field-pair dd {
+	margin: 0 0 0 20px;
+	display: inline;
+}
+.form-field-pair dd.error {
+	margin: 0 0 0 20px;
+	display: inline;
+}
+
+/* End form formatting */
+
+
+
 .button {
    background-color: #4CAF50 ;
    border: none;

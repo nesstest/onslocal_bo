@@ -14,18 +14,34 @@
  * argument is an `Html` object containing the body of the page.
  *@
 @main("Edit Dataset -> Staging") {
-<h1>Put Me On Stage</h1>
-<img src="/assets/images/dougal.png"/>
-<br/> 
-    @form(action=routes.EditController.processform()) {
-       @inputText(editForm("dsname"))
-       @inputText(editForm("dimdsid"))
+<div class="content">
+	<div>  
+	  <h1>Edit Dataset</h1>    
+	</div>  
+	      
+	<div> 
+	   @helper.form(action=routes.EditController.processform()) {  
+	   
+	   @helper.input(editForm("dimdsid"), '_label -> "Enter Dataset ID", '_class -> "form-field-pair") { (id, name, value, args) =>
+	    <input class="inputs" type="text" value="" size="10" autocomplete="off" name="@name" id="@id" placeholder="Dataset ID" @toHtmlArgs(args)>
+	   }
+	   
+	   @helper.input(editForm("dsname"), '_label -> "Enter Dataset Title", '_class -> "form-field-pair") { (id, name, value, args) =>
+	    <input class="inputs" type="text" autocomplete="off" name="title" id="dsTitle" placeholder="Dataset Title" value="">
+	   } 
+
        @inputRadioGroup(
        editForm("task"),
           options = options("T"->"Load To Target","O"->"Other"),
           '_label -> "Action",
+          '_class -> "form-field-pair",
           '_error -> editForm("task").error.map(_.withMessage("select task")))
-       <input type="submit" value="Submit">
+	   <div class="load"> 
+	     <button class="button" type="submit" style="margin-top:20px; line-height: 20px" id="Load">
+	       <span>Edit</span>
+	     </button> 
+	   </div>   
     }
-
+	</div>
+</div>
 }

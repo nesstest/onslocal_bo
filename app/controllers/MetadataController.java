@@ -16,6 +16,9 @@ import javax.persistence.EntityManager;
 import services.MetadataParser;
 import play.db.jpa.JPAApi;
 import play.db.jpa.Transactional;
+
+import play.twirl.api.Html;
+
 /**
  * This controller contains an action to process the input file
  */
@@ -29,11 +32,22 @@ public class MetadataController extends Controller {
 	
 	@Inject
 	JPAApi jpaApi;
+	
+	
+   @Transactional
+   public Result processform() {
+   	
+   Form<Metadata> metaForm = formFactory.form(Metadata.class).bindFromRequest();
+   	if(metaForm.hasErrors()) {
+   	   return badRequest(views.html.metadata.render(metaForm));
+   	} else {
     
-    @Transactional
-    public Result processform() {
-    	Form<Metadata> metaForm = formFactory.form(Metadata.class);
-    	Metadata met1 = metaForm.bindFromRequest().get();
+//    @Transactional
+//    public Result processform() {
+//    	Form<Metadata> metaForm = formFactory.form(Metadata.class);
+   		
+   	Metadata met1 = metaForm.get();
+    	//Metadata met1 = metaForm.bindFromRequest().get();
     
     	json = met1.getJson();
     	dsname = met1.getDsname();
@@ -44,7 +58,7 @@ public class MetadataController extends Controller {
         mp.runJPA(em);
 		
 		
-    return ok(dsname + " " + dimdsid + " " + json );
+   // return ok(dsname + " " + dimdsid + " " + json );
     //	 ValidationError e = new ValidationError("name", "dataset already exist",new ArrayList());
     //	 ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
     //	 errors.add(e);
@@ -52,6 +66,10 @@ public class MetadataController extends Controller {
     // 	Result badRequest = badRequest(views.html.load.render(dsForm));
     //	return badRequest;
    // 	return ok (ds1.getStatus());
+    
+    return ok(views.html.message.render((dimdsid + " loaded"), Html.apply("<p>Dataset id: " + dimdsid + "<br/>Dataset title: " + dsname + "<br/>JSON: " + json + "</p>")));
+ }
+    
     }
     
 }
