@@ -12,11 +12,17 @@
  * argument is an `Html` object containing the body of the page.
  *@
 @main("Show Me The Logs") {
-<h1>Show Me The Logs</h1>
-<img src="/assets/images/dougal.png"/>
-<br/> 
+<div class="content">
+	<div>  
+	  <h1>View Log</h1>    
+	</div>  
+	      
+	<div> 
     @form(action=routes.LogsController.showLog()) {
-       @textarea(field = logForm("logtext"), args = 'rows -> 30, 'cols -> 150)
+       @textarea(field = logForm("logtext"), args = 'rows -> 30, 'class -> "inputs-wide", '_label -> "Log text")
     }
+
+	</div>
+</div>
 
 }

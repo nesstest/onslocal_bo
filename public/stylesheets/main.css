@@ -68,13 +68,13 @@ nav ul li a:hover {
 }
 .content {
 	width: 900px;
-	margin: 0 auto 20px auto;
+	margin: 0 auto 30px auto;
 }
 .content h1 {
 	font-size: 24px;
     font-weight: 300;
     line-height: 24px;
-    margin: 40px 0 0 0;
+    margin: 40px 0 20px 0;
     padding: 3px 0 5px 0;
 }
 .content-highlight-container {
@@ -164,7 +164,54 @@ form {
 
 /* End form formatting */
 
+/* Status Table */
 
+table {
+	border-color: grey;
+	min-width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+    background-color: white;
+    border-bottom: 1px solid #D0D2D3;
+    border-left: 1px solid #D0D2D3;
+    border-right: 1px solid #D0D2D3;
+    display: table;
+}
+thead {
+    display: table-header-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+tr:not(:last-of-type) {
+    border-bottom: solid 1px #D0D2D3;
+}
+th {
+    font-weight: bold;
+    text-align: left;
+    position: relative;
+    padding: 0;
+    background-color: #D0D2D3;
+}
+td, th {
+    display: table-cell;
+    vertical-align: inherit;
+}
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+td, th {
+    padding: 7px 0 9px 16px;
+    vertical-align: baseline;
+}
+
+/* End Status Table */
 
 .button {
    background-color: #4CAF50 ;
@@ -192,6 +239,22 @@ inputs-moz-placeholder {
    font-weight: 400;
    font-size: 14px;
    color: #9D9E9E ;
+   text-shadow: 1px 1px 0 rgba(256, 256, 256, 1.0);
+   background: #FFF;
+   border: 1px solid #FFF;
+   border-radius: 5px;
+   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50);
+   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50);
+   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50);
+}
+.inputs-wide {
+   margin-top: 10px;	
+   width: 850px;
+   padding: 15px 25px;
+   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+   font-weight: 400;
+   font-size: 14px;
+   color: #000 ;
    text-shadow: 1px 1px 0 rgba(256, 256, 256, 1.0);
    background: #FFF;
    border: 1px solid #FFF;
