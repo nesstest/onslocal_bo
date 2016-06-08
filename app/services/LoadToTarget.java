@@ -24,7 +24,8 @@ public class LoadToTarget implements Runnable {
 	EntityManager em;
 	Long ddsid;
 	String dsname;
-	
+	Boolean singlearea;
+	Boolean singletime;
 	public LoadToTarget(Editor ed) {
 		this.ddsid = ed.getDimdsid();
 		this.dsname = ed.getDsname();
@@ -68,16 +69,23 @@ public class LoadToTarget implements Runnable {
 		    	7. Try to find a population record for the current area / time combo, if not found create a new one for it
 		    	8. we should now have all the required ids populated and can do a "persist" on the data.
 		*/
-		
+		singlearea = true;
+		singletime = false;
 		try {
 			DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		
 			// set default types
-			UnitType ut = em.find(UnitType.class, "Count");
+			UnitType ut = em.find(UnitType.class, "Persons");
 			if (ut == null){
 			   ut = new UnitType();
-			   ut.setUnitType("Count");
+			   ut.setUnitType("Persons");
 			   em.persist(ut);
+			}
+			ValueDomain vd = em.find(ValueDomain.class, "Count");
+			if (vd == null){
+			   vd = new ValueDomain();
+			   vd.setValueDomain("Count");
+			   em.persist(vd);
 			}
 			TimeType tt = em.find(TimeType.class, "QUARTER");
 			if (tt == null){
@@ -85,10 +93,10 @@ public class LoadToTarget implements Runnable {
 			   tt.setTimeType("QUARTER");
 			   em.persist(tt);
 			}
-			GeographicAreaHierarchy hier = em.find(GeographicAreaHierarchy.class, "2011GPH");
+			GeographicAreaHierarchy hier = em.find(GeographicAreaHierarchy.class, "2013ADMIN");
 			if (hier == null){
 				   hier = new GeographicAreaHierarchy();
-				   hier.setGeographicAreaHierarchy("2011GPH");
+				   hier.setGeographicAreaHierarchy("2013ADMIN");
 				   em.persist(hier);
 				}
 			GeographicAreaType gtype = em.find(GeographicAreaType.class,"UK");
@@ -103,6 +111,28 @@ public class LoadToTarget implements Runnable {
 				   glevel.setGeographicLevelType("UK");
 				   em.persist(glevel);
 				}
+			// single area UK
+	    	String extCode = "K02000001";
+			List singleAreaList =  em.createQuery("SELECT a FROM GeographicArea a WHERE a.extCode = :ecode",GeographicArea.class).setParameter("ecode", extCode).getResultList();
+			GeographicArea singlegeo = null;
+	//		logger.info("arealist = " + areaList.size());
+			
+			if (singleAreaList.isEmpty()){
+				singlegeo = new GeographicArea();
+				singlegeo.setExtCode(extCode);
+				singlegeo.setGeographicAreaHierarchyBean(hier);
+    		 // get type and level from helper
+				singlegeo.setGeographicAreaTypeBean(gtype);
+				singlegeo.setGeographicLevelTypeBean(glevel);
+				singlegeo.setName("Missing Area");
+    		 em.persist(singlegeo);
+    		 logger.info("area " + extCode + " not found creating dummy entry");
+    		}
+    		else
+      		{
+    			singlegeo = (GeographicArea)singleAreaList.get(0);
+    		}
+			
 			List results =  em.createQuery("SELECT s FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
 			logger.info("records found = " + results.size());
 			for (int i = 0; i < 500; i++){
@@ -163,6 +193,7 @@ public class LoadToTarget implements Runnable {
 	    		 var = new Variable();
 		    	 var.setName(variableName);
 		    	 var.setUnitTypeBean(ut);
+		    	 var.setValueDomainBean(vd);
 			     em.persist(var);
 	    		}
 	    		else
@@ -172,25 +203,27 @@ public class LoadToTarget implements Runnable {
 
 				
 		   // 	5. Try to fetch the geographic area id by extcode, if not found create new geographic area and derive area and level types via lookup on first three digits of extcode
-		    	String extCode = sdp.getGeographicArea();
-				List areaList =  em.createQuery("SELECT a FROM GeographicArea a WHERE a.extCode = :ecode",GeographicArea.class).setParameter("ecode", extCode).getResultList();
-				GeographicArea geo = null;
-		//		logger.info("arealist = " + areaList.size());
-				
-				if (areaList.isEmpty()){
-	    		 geo = new GeographicArea();
-	    		 geo.setExtCode(extCode);
-	    		 geo.setGeographicAreaHierarchyBean(hier);
-	    		 geo.setGeographicAreaTypeBean(gtype);
-	    		 geo.setGeographicLevelTypeBean(glevel);
-	    		 geo.setName(GeogHelper.getNameFromExtcode(extCode));
-	    		 em.persist(geo);
-	    		}
-	    		else
-	      		{
-	    			geo = (GeographicArea)areaList.get(0);
-	    		}
-				
+				GeographicArea geo = singlegeo;
+				if (!singlearea){
+				     extCode = sdp.getGeographicArea();
+				     List areaList =  em.createQuery("SELECT a FROM GeographicArea a WHERE a.extCode = :ecode",GeographicArea.class).setParameter("ecode", extCode).getResultList();
+					//		logger.info("arealist = " + areaList.size());
+					if (areaList.isEmpty()){
+						geo = new GeographicArea();
+						geo.setExtCode(extCode);
+						geo.setGeographicAreaHierarchyBean(hier);
+	    		 // get type and level from helper
+						geo.setGeographicAreaTypeBean(gtype);
+						geo.setGeographicLevelTypeBean(glevel);
+						geo.setName("Missing Area");
+						em.persist(geo);
+						logger.info("area " + extCode + " not found creating dummy entry");
+					}
+					else
+					{
+						geo = (GeographicArea)areaList.get(0);
+					}
+				}
 		    	// 6. Try to fetch a time id for the current time code. If not found create a new time_period entry.
 				String timeCode = sdp.getTimePeriodCode();
 				List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();

@@ -1,0 +1,32 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence persistence_1_0.xsd" version="1.0">
+    <persistence-unit name="OnslocalBOPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>models.StageCategory</class>
+        <class>models.StageCategoryPK</class>
+        <class>models.StageDimensionalDataPoint</class>
+        <class>models.Category</class>
+        <class>models.ConceptSystem</class>
+        <class>models.DataResource</class>
+        <class>models.DimensionalDataPoint</class>
+        <class>models.DimensionalDataPointPK</class>
+        <class>models.DimensionalDataSet</class>
+        <class>models.GeographicArea</class>
+        <class>models.GeographicAreaHierarchy</class>
+        <class>models.GeographicAreaType</class>
+        <class>models.GeographicLevelType</class>
+        <class>models.ObservationType</class>
+        <class>models.Population</class>
+        <class>models.PopulationPK</class>
+        <class>models.Presentation</class>
+        <class>models.PresentationType</class>
+        <class>models.SubjectField</class>
+        <class>models.Taxonomy</class>
+        <class>models.TimePeriod</class>
+        <class>models.TimeType</class>
+        <class>models.UnitType</class>
+        <class>models.ValueDomain</class>
+        <class>models.Variable</class>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        <non-jta-data-source>OnslocalBODS</non-jta-data-source>
+    </persistence-unit>
+</persistence>
