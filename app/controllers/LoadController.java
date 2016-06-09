@@ -9,6 +9,7 @@ import play.data.FormFactory;
 import play.data.validation.ValidationError;
 
 import java.util.ArrayList;
+import java.io.File;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -36,20 +37,27 @@ public class LoadController extends Controller {
     
     @Transactional
     public Result processform() {
+   	 
+
     	
     Form<Dataset> dsForm = formFactory.form(Dataset.class).bindFromRequest();
     	if(dsForm.hasErrors()) {
     	   return badRequest(views.html.load.render(dsForm));
     	} else {
     		
+   	    play.mvc.Http.MultipartFormData<File> body = request().body().asMultipartFormData();
+    	    play.mvc.Http.MultipartFormData.FilePart<File> filename = body.getFile("filename");	
+    		
     	Dataset form = dsForm.get();
     	  id = form.getId();    		 
           title = form.getTitle();
-          filename = form.getFilename();
+       //   filename = filename.getFilename();
           status   = form.getStatus();
+          String fileName = filename.getFilename();
     	 // String fullPath = "C:\\Users\\Admin\\Documents\\ILCH\\" + filename;
-       	  String fullPath = "C:\\ILCH\\" + filename;
-       	  InputCSVParser inputCSV = new InputCSVParser(form,fullPath);
+       //	  String fullPath = "C:\\ILCH\\" + filename;
+          java.io.File file = filename.getFile();
+       	  InputCSVParser inputCSV = new InputCSVParser(form,file);
    		  EntityManager em = jpaApi.em();  
    		  DataResource drs = new DataResource();
    		  drs.setDataResource(id);
@@ -63,7 +71,7 @@ public class LoadController extends Controller {
       
          //return ok(id + " " + title + " " + filename + " " + form.getStatus());
          
-         return ok(views.html.message.render((id + " " + form.getStatus()), Html.apply("<p>Dataset id: " + id + "<br/>Dataset title: " + title + "<br/>Filename: " + filename + "<br/>Status: " + form.getStatus() + "</p>")));
+         return ok(views.html.message.render((id + " " + form.getStatus()), Html.apply("<p>Dataset id: " + id + "<br/>Dataset title: " + title + "<br/>Filename: " + fileName + "<br/>Status: " + form.getStatus() + "</p>")));
       }
    }
 }

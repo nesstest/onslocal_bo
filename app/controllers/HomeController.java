@@ -57,7 +57,7 @@ public class HomeController extends Controller {
     	Form<Editor> editForm = formFactory.form(Editor.class);
     	Editor ed1 = new Editor();
     	ed1.setTask("T");
-    	ed1.setDsname("TEST1");
+  //  	ed1.setDsname("TEST1");
     	ed1.setDimdsid(11L); 
         return ok(views.html.edit.render(editForm.fill(ed1)));
    // 	return ok(load.render("Choose a dataset to load."));
