@@ -19,8 +19,14 @@ public class DataResource implements Serializable {
 	@Column(name="data_resource")
 	private String dataResource;
 
+	@Column(name="column_concept")
+	private String columnConcept;
+	
 	private String metadata;
 
+	@Column(name="row_concept")
+	private String rowConcept;
+	
 	private String title;
 
 	//bi-directional many-to-many association to Taxonomy
@@ -51,6 +57,13 @@ public class DataResource implements Serializable {
 		this.dataResource = dataResource;
 	}
 
+	public String getColumnConcept() {
+		return this.columnConcept;
+	}
+
+	public void setColumnConcept(String columnConcept) {
+		this.columnConcept = columnConcept;
+	}
 	public String getMetadata() {
 		return this.metadata;
 	}
@@ -58,7 +71,15 @@ public class DataResource implements Serializable {
 	public void setMetadata(String metadata) {
 		this.metadata = metadata;
 	}
+	
+	public String getRowConcept() {
+		return this.rowConcept;
+	}
 
+	public void setRowConcept(String rowConcept) {
+		this.rowConcept = rowConcept;
+	}
+	
 	public String getTitle() {
 		return this.title;
 	}
