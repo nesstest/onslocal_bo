@@ -19,7 +19,7 @@
 	</div>  
 	      
 	<div> 
-	   @helper.form(action=routes.LoadController.processform()) {  
+	   @helper.form(action=routes.LoadController.processform(), 'enctype -> "multipart/form-data") {  
 	   
 	   @helper.input(dsForm("id"), '_label -> "Enter Dataset ID", '_class -> "form-field-pair") { (id, name, value, args) =>
 	    <input class="inputs" type="text" value="" size="10" autocomplete="off" name="@name" id="@id" placeholder="Dataset ID" @toHtmlArgs(args)>

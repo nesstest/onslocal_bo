@@ -81,10 +81,6 @@ public class Dataset {
           }
       }            
       
-      if (filename == null || filename.length() == 0) {
-          errors.add(new ValidationError("filename", "No filename was given."));
-      }    
-
       if(errors.size() > 0){
           return errors;
       }
