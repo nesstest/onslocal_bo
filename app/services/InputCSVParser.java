@@ -50,6 +50,7 @@ public class InputCSVParser implements Runnable {
 	private final String busAreaName;
 	private Dataset dataset;
 	private String filename;
+	private File inFile;
 	/** The _logger. */
     private static final Logger.ALogger logger = Logger.of(InputCSVParser.class);
 	/** The Constant END_OF_FILE. */
@@ -79,10 +80,11 @@ public class InputCSVParser implements Runnable {
 	EntityManager em;
 	DimensionalDataSet dds;
 	
-	public InputCSVParser(long job, long area, String busAreaName, Dataset ds, String file) {
+	public InputCSVParser(long job, long area, String busAreaName, Dataset ds, String file, File inFile) {
 		this.jobId = job;
 		this.busArea = area;
 		this.filename = file;
+		this.inFile = inFile;
 		this.dataset = ds;
 		this.busAreaName = busAreaName;
 	}
@@ -92,6 +94,15 @@ public class InputCSVParser implements Runnable {
 		this.busArea = 0;
 		this.busAreaName = "Global";
 		this.filename = file;
+		this.dataset = ds;
+	}
+	
+	public InputCSVParser(Dataset ds, File file) {
+		this.jobId = 0;
+		this.busArea = 0;
+		this.busAreaName = "Global";
+		this.inFile = file;
+		this.filename = "object";
 		this.dataset = ds;
 	}
 	
@@ -177,7 +188,8 @@ public class InputCSVParser implements Runnable {
 			String csvPath = filename;
 			String filePathArray[] = filename.split("/");
 			filename = filePathArray[filePathArray.length - 1];
-			BufferedReader csvReader = getCSVBufferedReader(csvPath);
+//			BufferedReader csvReader = getCSVBufferedReader(csvPath);
+			BufferedReader csvReader = getCSVBufferedReader(inFile);
 			CSVParser csvParser = new CSVParser();
 			if (csvReader != null) {
 				try {
@@ -426,6 +438,18 @@ public class InputCSVParser implements Runnable {
 		BufferedReader csvReader = null;
 		try {
 			csvReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName)), "UTF-8"), 32768);
+		} catch (IOException e) {
+			logger.error("Failed to get the BufferedReader: ", e);
+			throw new GLLoadException("Failed to get the BufferedReader: ", e);
+		}
+		return csvReader;
+	}
+	
+	public BufferedReader getCSVBufferedReader(File inFile) {
+//		logger.info("getCSVBufferedReader() [" + fileName+"]");
+		BufferedReader csvReader = null;
+		try {
+			csvReader = new BufferedReader(new InputStreamReader(new FileInputStream(inFile), "UTF-8"), 32768);
 		} catch (IOException e) {
 			logger.error("Failed to get the BufferedReader: ", e);
 			throw new GLLoadException("Failed to get the BufferedReader: ", e);
