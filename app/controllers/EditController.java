@@ -3,6 +3,7 @@ package controllers;
 import play.*;
 import play.data.Form;
 import play.mvc.*;
+import play.twirl.api.Html;
 import views.html.*;
 import models.*;
 import play.data.FormFactory;
@@ -32,8 +33,13 @@ public class EditController extends Controller {
     
     @Transactional
     public Result processform() {
-    	Form<Editor> editForm = formFactory.form(Editor.class);
-    	Editor ed1 = editForm.bindFromRequest().get();
+    	Form<Editor> editForm = formFactory.form(Editor.class).bindFromRequest();
+    	
+   	if(editForm.hasErrors()) {
+   	   return badRequest(views.html.edit.render(editForm));
+   	} else {
+    	
+    	Editor ed1 = editForm.get();
     
     	task = ed1.getTask();
     	dsname = ed1.getDsname();
@@ -58,8 +64,9 @@ For each staged dimensional data point matching the current dimensional data set
 		EntityManager em = jpaApi.em();
         lot.runJPA(em);
 	
-		
-    return ok(dsname + " " + dimdsid + " " + task );
+        return ok(views.html.message.render(("Dataset " + dimdsid + " loaded to target"), Html.apply("<p>Dataset id: " + dimdsid + "</p>")));
+   	 }		
+   // return ok(dsname + " " + dimdsid + " " + task );
     //	 ValidationError e = new ValidationError("name", "dataset already exist",new ArrayList());
     //	 ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
     //	 errors.add(e);

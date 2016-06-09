@@ -23,29 +23,29 @@
 	<article class="box-nav-item">
 		<a href="@routes.HomeController.load()">
 			<img style="float:right;" width="64" height="64" src="/assets/images/load_icon.png"/>
-			<h2>Load Dataset</h2>
-			<p>Load a new dataset to the system</p>
+			<h2>Create Dataset</h2>
+			<p>Create a new dataset in the system</p>
 		</a>
 	</article>
 	<article class="box-nav-item">
 		<a href="@routes.EditController.processform()">
 			<img style="float:right;" width="64" height="64" src="/assets/images/edit_icon.png"/>
-			<h2>Edit Dataset</h2>
-			<p>Edit an existing dataset</p>
+			<h2>Load to Target</h2>
+			<p>Load an existing dataset to target</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.EditController.processform()">
+			<img style="float:right;" width="64" height="64" src="/assets/images/edit_icon.png"/>
+			<h2>Edit Attributes</h2>
+			<p>Edit the attributes of an existing dataset</p>
 		</a>
 	</article>
 	<article class="box-nav-item">
 		<a href="@routes.HomeController.metadata()">
 			<img style="float:right;" width="64" height="64" src="/assets/images/metadata_icon.png"/>
 			<h2>Load Metadata</h2>
-			<p>Load metadata to the system</p>
-		</a>
-	</article>
-	<article class="box-nav-item">
-		<a href="@routes.StatusController.getDatasets()">
-			<img style="float:right;" width="64" height="64" src="/assets/images/status_icon.png"/>
-			<h2>View Status</h2>
-			<p>View system status</p>
+			<p>Load json metadata for a dataset</p>
 		</a>
 	</article>
 	<article class="box-nav-item">
@@ -60,6 +60,13 @@
 			<img style="float:right;" width="64" height="64" src="/assets/images/publish_icon.png"/>
 			<h2>Publish</h2>
 			<p>Publish the dataset</p>
+		</a>
+	</article>
+	<article class="box-nav-item">
+		<a href="@routes.StatusController.getDatasets()">
+			<img style="float:right;" width="64" height="64" src="/assets/images/status_icon.png"/>
+			<h2>View Status</h2>
+			<p>View system status</p>
 		</a>
 	</article>
 	<article class="box-nav-item">

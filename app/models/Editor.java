@@ -1,9 +1,16 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import play.data.validation.ValidationError;
+
 public class Editor {
 	  private String dsname;
 	  private Long dimdsid;
 	  private String task;
+	    private String status;
 	  
 	public String getDsname() {
 		return dsname;
@@ -24,4 +31,27 @@ public class Editor {
 		this.task = task;
 	}
 
+   public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+   public List<ValidationError> validate() {
+
+      List<ValidationError> errors = new ArrayList<ValidationError>();
+      
+      if (dimdsid == null) {
+        errors.add(new ValidationError("dimdsid", "No id was given."));
+      }
+      
+      if(errors.size() > 0){
+          return errors;
+      }
+      else{
+        return null;
+      }  
+    }
+	
 }
