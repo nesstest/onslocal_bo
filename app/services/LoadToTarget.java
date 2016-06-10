@@ -26,6 +26,7 @@ public class LoadToTarget implements Runnable {
 	String dsname;
 	Boolean singlearea;
 	Boolean singletime;
+	Long recct;
 	public LoadToTarget(Editor ed) {
 		this.ddsid = ed.getDimdsid();
 		this.dsname = ed.getDsname();
@@ -39,22 +40,33 @@ public class LoadToTarget implements Runnable {
 	@Override
 	public void run() {
 		logger.info(String.format("Loading to Target started for dataset id " + ddsid + " (" +dsname+")"));
+		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
-			StageToTarget();
-
+			StageToTarget(ds);
+			logger.info("loaded " + recct + "records");
+			ds.setStatus("2-Target-OK");
+			ds.setObscount(recct);
 		//	this.dataset.setStatus("Loaded to staging");
 			logger.info(String.format("Load to Target successful"));
 		} catch (CSVValidationException validationException) {
 	//		this.dataset.setStatus("Input file failed validation");
+			ds.setStatus("2-Target-Failed");
+			ds.setValidationMessage(validationException.getMessage());
+			ds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("Loading to target not successful - " + validationException.getMessage() ));
 		} catch (GLLoadException loadException) {
 		//	this.dataset.setStatus("Loading of observations failed");
+			ds.setStatus("2-Target-Failed");
+			ds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading to target not successful - ",  loadException ));
 		} finally {
+			em.persist(ds);
 		}
+		
+
 	}
 	
-	private void StageToTarget(){
+	private void StageToTarget(DimensionalDataSet ds){
 		/*    	
 		For each staged dimensional data point matching the current dimensional data set id...
 		    	
@@ -72,7 +84,7 @@ public class LoadToTarget implements Runnable {
 		singlearea = true;
 		singletime = false;
 		try {
-			DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
+	//		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		
 			// set default types
 			UnitType ut = em.find(UnitType.class, "Persons");
@@ -87,11 +99,23 @@ public class LoadToTarget implements Runnable {
 			   vd.setValueDomain("Count");
 			   em.persist(vd);
 			}
-			TimeType tt = em.find(TimeType.class, "QUARTER");
-			if (tt == null){
-			   tt = new TimeType();
-			   tt.setTimeType("QUARTER");
-			   em.persist(tt);
+			TimeType ttq = em.find(TimeType.class, "QUARTER");
+			if (ttq == null){
+			   ttq = new TimeType();
+			   ttq.setTimeType("QUARTER");
+			   em.persist(ttq);
+			}
+			TimeType ttm = em.find(TimeType.class, "MONTH");
+			if (ttm == null){
+			   ttm = new TimeType();
+			   ttm.setTimeType("MONTH");
+			   em.persist(ttm);
+			}
+			TimeType tty = em.find(TimeType.class, "YEAR");
+			if (tty == null){
+			   tty = new TimeType();
+			   tty.setTimeType("YEAR");
+			   em.persist(tty);
 			}
 			GeographicAreaHierarchy hier = em.find(GeographicAreaHierarchy.class, "2013ADMIN");
 			if (hier == null){
@@ -135,6 +159,7 @@ public class LoadToTarget implements Runnable {
 			
 			List results =  em.createQuery("SELECT s FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
 			logger.info("records found = " + results.size());
+			recct = 0L;
 			for (int i = 0; i < 500; i++){
 				StageDimensionalDataPoint sdp = (StageDimensionalDataPoint)results.get(i);
 		    //	1. Create a skeleton dimensional data point record in memory
@@ -236,7 +261,15 @@ public class LoadToTarget implements Runnable {
 	    		 Date startDate = new Date();
 	    		 tim.setStartDate(startDate);
 	    		 tim.setEndDate(startDate);
-	    		 tim.setTimeTypeBean(tt);
+	    		 tim.setTimeTypeBean(ttq);
+	    		 if (sdp.getTimeType().equalsIgnoreCase("QUARTER"))
+	    		 {
+	    			 tim.setTimeTypeBean(ttq);
+	    		 }
+	    		 if (sdp.getTimeType().equalsIgnoreCase("MONTH"))
+	    		 {
+	    			 tim.setTimeTypeBean(ttm);
+	    		 }
 	    		 em.persist(tim);
 	    		}
 	    		else
@@ -263,7 +296,8 @@ public class LoadToTarget implements Runnable {
 				dp.setVariable(var);
 				em.persist(dp);
 				
-				logger.info("recno = " + sdp.getObservationSeqId());
+				recct = recct + 1;
+
 			}
 			
 		} catch (Exception e) {

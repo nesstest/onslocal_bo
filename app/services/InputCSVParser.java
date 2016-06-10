@@ -118,16 +118,23 @@ public class InputCSVParser implements Runnable {
 		try {
 			parseCSV();
 			this.dataset.setStatus("Loaded to staging");
+			dds.setStatus("1-Staging-OK");
 			logger.info(String.format("Observations successfully loaded for Job %s.", jobId));
 		} catch (CSVValidationException validationException) {
 			// Update status to Observations loading failed
 			this.dataset.setStatus("Input file failed validation");
+			dds.setStatus("1-Staging-Failed");
+			dds.setValidationMessage(validationException.getMessage());
+			dds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("Observations file failed validation for Job %s : %s", jobId, validationException ));
 		} catch (GLLoadException loadException) {
 			// Update status to Observations loaded
 			this.dataset.setStatus("Loading of observations failed");
+			dds.setStatus("1-Staging-Failed");
+			dds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading of observations into staging was not successful for Job %s : %s", jobId, loadException ));
 		} finally {
+			em.persist(dds);
 		}
 	}
 	

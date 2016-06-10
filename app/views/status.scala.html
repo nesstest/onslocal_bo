@@ -17,7 +17,7 @@
 	<div> 
 	
 	    <table border=1 class="table">
-	        <thead><th>Resource ID</th><th>DimDataset ID</th><th>Status</th><th>Validation Message</th><th>Validation Exception</th><th>Load Exception</th></thead>
+	        <thead><th>Resource ID</th><th>DimDataset ID</th><th>Status</th><th>Validation Exception</th><th>Load Exception</th></thead>
 	        <tbody>
 	@for(dataset <- datasetList){
 	
@@ -25,7 +25,6 @@
 	         <td>@dataset.getDataResourceBean().getDataResource()</td>
 	         <td>@dataset.getDimensionalDataSetId()</td>
 	         <td>@dataset.getStatus()</td>
-	         <td>@dataset.getValidationMessage()</td>
 	         <td>@dataset.getValidationException()</td>
 	         <td>@dataset.getLoadException()</td>
 	         </tr>

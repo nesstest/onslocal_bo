@@ -32,18 +32,25 @@ public class MetadataParser implements Runnable {
 	@Override
 	public void run() {
 		logger.info(String.format("Metadata Loading started for dataset id " + ddsid));
+		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
-			parseJSON();
-
+			parseJSON(ds);
+			ds.setStatus("4-Metadata-OK");
 		//	this.dataset.setStatus("Loaded to staging");
 			logger.info(String.format("JSON successfully loaded"));
 		} catch (CSVValidationException validationException) {
+			ds.setStatus("4-Metadata-Failed");
+			ds.setValidationMessage(validationException.getMessage());
+			ds.setValidationException(validationException.getLocalizedMessage());
 	//		this.dataset.setStatus("Input file failed validation");
 			logger.info(String.format("Metadata file failed validation - " + validationException.getMessage() ));
 		} catch (GLLoadException loadException) {
 		//	this.dataset.setStatus("Loading of observations failed");
+			ds.setStatus("4-Metadata-Failed");
+			ds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading of metadata was not successful - ",  loadException ));
 		} finally {
+			em.persist(ds);
 		}
 	}
 	
@@ -70,10 +77,10 @@ public class MetadataParser implements Runnable {
 	*/
 	
 	
-	private void parseJSON(){
+	private void parseJSON(DimensionalDataSet ds){
 		try {
 			JSONObject json = new JSONObject(jsonString);
-			DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
+		//	DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 			// json text
 			ds.setMetadata(jsonString);
 			// title
