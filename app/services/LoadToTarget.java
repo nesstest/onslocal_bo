@@ -43,7 +43,7 @@ public class LoadToTarget implements Runnable {
 		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
 			StageToTarget(ds);
-			logger.info("loaded " + recct + "records");
+			logger.info("loaded " + recct + " records");
 			ds.setStatus("2-Target-OK");
 			ds.setObscount(recct);
 		//	this.dataset.setStatus("Loaded to staging");
@@ -80,12 +80,25 @@ public class LoadToTarget implements Runnable {
 		    	6. Try to fetch a time id for the current time code. If not found create a new time_period entry.
 		    	7. Try to find a population record for the current area / time combo, if not found create a new one for it
 		    	8. we should now have all the required ids populated and can do a "persist" on the data.
+		CHANGE - count the times and areas and fix if only one
+		CHANGE - Assume geography preloaded - error if not
 		*/
 		singlearea = true;
-		singletime = false;
+		singletime = true;
 		try {
 	//		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
-		
+			
+			List areas =  em.createQuery("SELECT distinct s.geographicArea FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
+			List times =  em.createQuery("SELECT distinct s.timePeriodCode FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
+		 	logger.info("area count = " + areas.size());
+		 	logger.info("time count =  " + times.size());
+			if (areas.size() > 1){
+				singlearea = false;
+			}
+			if (times.size() > 1){
+				singletime = false;
+			}
+		 	
 			// set default types
 			UnitType ut = em.find(UnitType.class, "Persons");
 			if (ut == null){
@@ -117,50 +130,58 @@ public class LoadToTarget implements Runnable {
 			   tty.setTimeType("YEAR");
 			   em.persist(tty);
 			}
-			GeographicAreaHierarchy hier = em.find(GeographicAreaHierarchy.class, "2013ADMIN");
-			if (hier == null){
-				   hier = new GeographicAreaHierarchy();
-				   hier.setGeographicAreaHierarchy("2013ADMIN");
-				   em.persist(hier);
-				}
-			GeographicAreaType gtype = em.find(GeographicAreaType.class,"UK");
-			if (gtype == null){
-				   gtype = new GeographicAreaType();
-				   gtype.setGeographicAreaType("UK");
-				   em.persist(gtype);
-				}
-			GeographicLevelType glevel = em.find(GeographicLevelType.class,"UK");
-			if (glevel == null){
-				   glevel = new GeographicLevelType();
-				   glevel.setGeographicLevelType("UK");
-				   em.persist(glevel);
-				}
-			// single area UK
-	    	String extCode = "K02000001";
-			List singleAreaList =  em.createQuery("SELECT a FROM GeographicArea a WHERE a.extCode = :ecode",GeographicArea.class).setParameter("ecode", extCode).getResultList();
-			GeographicArea singlegeo = null;
-	//		logger.info("arealist = " + areaList.size());
-			
-			if (singleAreaList.isEmpty()){
-				singlegeo = new GeographicArea();
-				singlegeo.setExtCode(extCode);
-				singlegeo.setGeographicAreaHierarchyBean(hier);
-    		 // get type and level from helper
-				singlegeo.setGeographicAreaTypeBean(gtype);
-				singlegeo.setGeographicLevelTypeBean(glevel);
-				singlegeo.setName("Missing Area");
-    		 em.persist(singlegeo);
-    		 logger.info("area " + extCode + " not found creating dummy entry");
-    		}
-    		else
-      		{
-    			singlegeo = (GeographicArea)singleAreaList.get(0);
-    		}
 			
 			List results =  em.createQuery("SELECT s FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
 			logger.info("records found = " + results.size());
 			recct = 0L;
-			for (int i = 0; i < 500; i++){
+			
+	    	String extCode = (String)areas.get(0);
+			GeographicArea singlegeo = null;
+			if (singlearea){
+				List singleAreaList =  em.createQuery("SELECT a FROM GeographicArea a WHERE a.extCode = :ecode",GeographicArea.class).setParameter("ecode", extCode).getResultList();
+				//		logger.info("arealist = " + areaList.size());
+			
+				if (singleAreaList.isEmpty()){
+					logger.error(String.format("area " + extCode + " not found on database"));
+					throw new CSVValidationException(String.format("area " + extCode + " not found on database"));
+				}
+				else
+				{
+					singlegeo = (GeographicArea)singleAreaList.get(0);
+				}
+			}
+			TimePeriod singleTim = null;
+			if (singletime){
+				String timeCode = (String)times.get(0);
+				List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
+				//		logger.info("timelist = " + timeList.size());
+				if (timeList.isEmpty()){
+					StageDimensionalDataPoint tsp = (StageDimensionalDataPoint)results.get(0);
+					singleTim = new TimePeriod();
+					singleTim.setName(timeCode);
+					Date startDate = new Date();
+					singleTim.setStartDate(startDate);
+					singleTim.setEndDate(startDate);
+					singleTim.setTimeTypeBean(ttq);
+					if (tsp.getTimeType().equalsIgnoreCase("QUARTER"))
+					{
+						singleTim.setTimeTypeBean(ttq);
+					}
+					if (tsp.getTimeType().equalsIgnoreCase("MONTH"))
+					{
+						singleTim.setTimeTypeBean(ttm);
+					}
+					em.persist(singleTim);
+				}
+				else
+				{
+					singleTim = (TimePeriod)timeList.get(0);
+				}
+			}
+
+	//		for (int i = 0; i < results.size(); i++){
+			// just the first 100 for now
+				for (int i = 0; i < 100; i++){
 				StageDimensionalDataPoint sdp = (StageDimensionalDataPoint)results.get(i);
 		    //	1. Create a skeleton dimensional data point record in memory
 				DimensionalDataPoint dp = new DimensionalDataPoint();
@@ -234,15 +255,8 @@ public class LoadToTarget implements Runnable {
 				     List areaList =  em.createQuery("SELECT a FROM GeographicArea a WHERE a.extCode = :ecode",GeographicArea.class).setParameter("ecode", extCode).getResultList();
 					//		logger.info("arealist = " + areaList.size());
 					if (areaList.isEmpty()){
-						geo = new GeographicArea();
-						geo.setExtCode(extCode);
-						geo.setGeographicAreaHierarchyBean(hier);
-	    		 // get type and level from helper
-						geo.setGeographicAreaTypeBean(gtype);
-						geo.setGeographicLevelTypeBean(glevel);
-						geo.setName("Missing Area");
-						em.persist(geo);
-						logger.info("area " + extCode + " not found creating dummy entry");
+						logger.error(String.format("area " + extCode + " not found on database"));
+						throw new CSVValidationException(String.format("area " + extCode + " not found on database"));
 					}
 					else
 					{
@@ -250,32 +264,35 @@ public class LoadToTarget implements Runnable {
 					}
 				}
 		    	// 6. Try to fetch a time id for the current time code. If not found create a new time_period entry.
-				String timeCode = sdp.getTimePeriodCode();
-				List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
-				TimePeriod tim = null;
-		//		logger.info("timelist = " + timeList.size());
+				TimePeriod tim = singleTim;
+				if (!singletime){
+					String timeCode = sdp.getTimePeriodCode();
+					List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
+
+					//		logger.info("timelist = " + timeList.size());
 				
-				if (timeList.isEmpty()){
-	    		 tim = new TimePeriod();
-	    		 tim.setName(timeCode);
-	    		 Date startDate = new Date();
-	    		 tim.setStartDate(startDate);
-	    		 tim.setEndDate(startDate);
-	    		 tim.setTimeTypeBean(ttq);
-	    		 if (sdp.getTimeType().equalsIgnoreCase("QUARTER"))
-	    		 {
-	    			 tim.setTimeTypeBean(ttq);
-	    		 }
-	    		 if (sdp.getTimeType().equalsIgnoreCase("MONTH"))
-	    		 {
-	    			 tim.setTimeTypeBean(ttm);
-	    		 }
-	    		 em.persist(tim);
-	    		}
-	    		else
-	      		{
-	    			tim = (TimePeriod)timeList.get(0);
-	    		}
+					if (timeList.isEmpty()){
+						tim = new TimePeriod();
+						tim.setName(timeCode);
+						Date startDate = new Date();
+						tim.setStartDate(startDate);
+						tim.setEndDate(startDate);
+						tim.setTimeTypeBean(ttq);
+						if (sdp.getTimeType().equalsIgnoreCase("QUARTER"))
+						{
+							tim.setTimeTypeBean(ttq);
+						}
+						if (sdp.getTimeType().equalsIgnoreCase("MONTH"))
+						{
+							tim.setTimeTypeBean(ttm);
+						}
+						em.persist(tim);
+					}
+					else
+					{
+						tim = (TimePeriod)timeList.get(0);
+					}
+				}
 
 		    //	7. Try to find a population record for the current area / time combo, if not found create a new one for it
 				PopulationPK ppk = new PopulationPK();
