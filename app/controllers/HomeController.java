@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import models.Dataset;
 import models.Editor;
 import models.Metadata;
+import models.EditAttribs;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
@@ -62,6 +63,11 @@ public class HomeController extends Controller {
         return ok(views.html.edit.render(editForm.fill(ed1)));
    // 	return ok(load.render("Choose a dataset to load."));
     }    
+    
+    public Result editattribs() {
+     	Form<EditAttribs> editAttribsForm = formFactory.form(EditAttribs.class);
+         return ok(views.html.editattribs.render(editAttribsForm));
+     }  
     
     public Result index() {
        return ok(views.html.index.render("Welcome"));

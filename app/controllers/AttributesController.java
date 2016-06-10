@@ -3,6 +3,7 @@ package controllers;
 import play.*;
 import play.data.Form;
 import play.mvc.*;
+import play.twirl.api.Html;
 import views.html.*;
 import models.*;
 import play.data.FormFactory;
@@ -61,7 +62,7 @@ public class AttributesController extends Controller {
     	drs.setRowConcept(a1.getRow_concept());
 		drs.setColumnConcept(a1.getColumn_concept());
 		em.persist(drs);
-return ok("col = " + a1.getColumn_concept() + "row=" + a1.getRow_concept() );
+		return ok(views.html.message.render(("Attributes updated"), Html.apply("<p>Column Concept: " + a1.getColumn_concept() + "<br/>Row Concept: " + a1.getRow_concept() + "</p>")));
 
     }
     
