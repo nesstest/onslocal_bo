@@ -154,7 +154,7 @@ public class LoadToTarget implements Runnable {
 			if (singletime){
 				String timeCode = (String)times.get(0);
 				List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
-				//		logger.info("timelist = " + timeList.size());
+				logger.info("timelist = " + timeList.size());
 				if (timeList.isEmpty()){
 					StageDimensionalDataPoint tsp = (StageDimensionalDataPoint)results.get(0);
 					singleTim = new TimePeriod();
@@ -269,8 +269,8 @@ public class LoadToTarget implements Runnable {
 					String timeCode = sdp.getTimePeriodCode();
 					List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
 
-					//		logger.info("timelist = " + timeList.size());
-				
+		//				logger.info("timelist2 = " + timeList.size());
+				     int timecount = timeList.size();
 					if (timeList.isEmpty()){
 						tim = new TimePeriod();
 						tim.setName(timeCode);
