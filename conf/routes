@@ -20,6 +20,10 @@ POST    /edit                       controllers.EditController.processform
 
 GET     /edit                       controllers.HomeController.edit
 
+POST    /editattribs                controllers.EditAttribsController.processform
+
+GET     /editattribs                controllers.HomeController.editattribs
+
 GET     /log                        controllers.HomeController.log
 
 GET    /status                      controllers.StatusController.getDatasets
