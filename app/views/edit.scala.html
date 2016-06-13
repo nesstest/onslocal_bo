@@ -22,8 +22,8 @@
 	<div> 
 	   @helper.form(action=routes.EditController.processform()) {  
 	   
-	   @helper.input(editForm("dimdsid"), '_label -> "Enter Dataset ID", '_class -> "form-field-pair") { (id, name, value, args) =>
-	    <input class="inputs" type="text" value="" size="10" autocomplete="off" name="dimdsid" id="dimdsid" placeholder="Dataset ID" @toHtmlArgs(args)>
+	   @helper.input(editForm("dsname"), '_label -> "Enter Dataset ID", '_class -> "form-field-pair") { (id, name, value, args) =>
+	    <input class="inputs" type="text" value="" size="10" autocomplete="off" name="dsname" id="dsname" placeholder="Dataset ID" @toHtmlArgs(args)>
 	   }
 	   
        <input type="hidden" value="T" size="10" name="task" id="task">

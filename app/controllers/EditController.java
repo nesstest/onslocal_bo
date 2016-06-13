@@ -10,6 +10,7 @@ import play.data.FormFactory;
 import play.data.validation.ValidationError;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -43,8 +44,15 @@ public class EditController extends Controller {
     
     	task = ed1.getTask();
     	dsname = ed1.getDsname();
-    	dimdsid = ed1.getDimdsid();
-    	
+		EntityManager em = jpaApi.em();
+    	List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", dsname).getResultList();
+    	// Logger.info("size = " + dis.size());
+    	DataResource drs = dis.get(0);
+    	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();
+    	Logger.info("size2 = " + dimds.size());
+    	dimdsid = dimds.get(0).getDimensionalDataSetId();
+      	Logger.info("dimsd = " + dimdsid);
+    	ed1.setDimdsid(dimdsid);
     	LoadToTarget lot = new LoadToTarget(ed1);
 /*    	
 For each staged dimensional data point matching the current dimensional data set id...
@@ -61,10 +69,10 @@ For each staged dimensional data point matching the current dimensional data set
     	8. we should now have all the required ids populated and can do a "persist" on the data.
 */
 
-		EntityManager em = jpaApi.em();
+
         lot.runJPA(em);
 	
-        return ok(views.html.message.render(("Dataset " + dimdsid + " loaded to target"), Html.apply("<p>Dataset id: " + dimdsid + "</p>")));
+        return ok(views.html.message.render(("Dataset " + dsname + " loaded to target"), Html.apply("<p>Dataset id: " + dsname + "</p>")));
    	 }		
    // return ok(dsname + " " + dimdsid + " " + task );
     //	 ValidationError e = new ValidationError("name", "dataset already exist",new ArrayList());

@@ -8,9 +8,10 @@ import java.util.regex.Pattern;
 import play.data.validation.ValidationError;
 
 public class Metadata {
-	  private Long dimdsid;
-	  private String json;
-	    private String status;
+	private String resourceId;
+	private Long dimdsid;
+	private String json;
+	private String status;
 	  
 	public Long getDimdsid() {
 		return dimdsid;
@@ -24,13 +25,25 @@ public class Metadata {
 	public void setJson(String json) {
 		this.json = json;
 	}
-	
+	  public String getResourceId() {
+		return resourceId;
+	}
+	public void setResourceId(String resourceId) {
+		this.resourceId = resourceId;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
    public List<ValidationError> validate() {
 
       List<ValidationError> errors = new ArrayList<ValidationError>();
       
-      if (dimdsid == null) {
-        errors.add(new ValidationError("dimdsid", "No id was given."));
+      if (resourceId == null) {
+        errors.add(new ValidationError("datasetid", "No id was given."));
       }
       
       if (json == null || json.length() == 0) {

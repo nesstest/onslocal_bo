@@ -42,8 +42,8 @@ public class Editor {
 
       List<ValidationError> errors = new ArrayList<ValidationError>();
       
-      if (dimdsid == null) {
-        errors.add(new ValidationError("dimdsid", "No id was given."));
+      if (dsname == null) {
+        errors.add(new ValidationError("dataset id", "No id was given."));
       }
       
       if(errors.size() > 0){

@@ -21,7 +21,7 @@
 	<div> 
 	   @helper.form(action=routes.MetadataController.processform()) {  
 	   
-	   @helper.input(metaForm("dimdsid"), '_label -> "Enter Dataset ID", '_class -> "form-field-pair") { (id, name, value, args) =>
+	   @helper.input(metaForm("resourceId"), '_label -> "Enter Dataset ID", '_class -> "form-field-pair") { (id, name, value, args) =>
 	    <input class="inputs" type="text" value="" size="10" autocomplete="off" name="@name" id="@id" placeholder="Dataset ID" @toHtmlArgs(args)>
 	   }
 	   

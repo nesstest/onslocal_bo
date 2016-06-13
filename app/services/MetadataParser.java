@@ -8,6 +8,9 @@ import utils.Utility;
 import exceptions.CSVValidationException;
 import exceptions.GLLoadException;
 import models.*;
+
+import java.util.List;
+
 import javax.inject.*;
 import play.db.jpa.JPAApi;
 import play.db.jpa.Transactional;
@@ -16,11 +19,12 @@ import play.db.jpa.Transactional;
 public class MetadataParser implements Runnable {
 	  private static final Logger.ALogger logger = Logger.of(MetadataParser.class);
 	EntityManager em;
+	String dsName;
 	Long ddsid;
 	String jsonString;
 	
 	public MetadataParser(Metadata met) {
-		this.ddsid = met.getDimdsid();
+		this.dsName = met.getResourceId();
 	    this.jsonString = met.getJson();
 	}
 	
@@ -31,7 +35,14 @@ public class MetadataParser implements Runnable {
 	
 	@Override
 	public void run() {
-		logger.info(String.format("Metadata Loading started for dataset id " + ddsid));
+		logger.info(String.format("Metadata Loading started for dataset id " + dsName));
+    	List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", dsName).getResultList();
+    	// Logger.info("size = " + dis.size());
+    	DataResource drs = dis.get(0);
+    	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();
+  //  	Logger.info("size2 = " + dimds.size());
+    	ddsid = dimds.get(0).getDimensionalDataSetId();
+	
 		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
 			parseJSON(ds);
