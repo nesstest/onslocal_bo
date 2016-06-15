@@ -1,9 +1,12 @@
 package services;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+
 import org.json.*;
 import play.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.persistence.exceptions.DatabaseException;
 
 import utils.GeogHelper;
 import utils.Utility;
@@ -11,6 +14,7 @@ import exceptions.CSVValidationException;
 import exceptions.GLLoadException;
 import models.*;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +46,11 @@ public class LoadToTarget implements Runnable {
 		logger.info(String.format("Loading to Target started for dataset id " + ddsid + " (" +dsname+")"));
 		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
+			ds.setStatus("2-Target-Failed");
+			ds.setValidationMessage(null);
+			ds.setValidationException(null);
+			ds.setLoadException(null);
+			em.merge(ds);
 			StageToTarget(ds);
 			logger.info("loaded " + recct + " records");
 			ds.setStatus("2-Target-OK");
@@ -58,9 +67,9 @@ public class LoadToTarget implements Runnable {
 		//	this.dataset.setStatus("Loading of observations failed");
 			ds.setStatus("2-Target-Failed");
 			ds.setLoadException(loadException.getMessage());
-			logger.info(String.format("Loading to target not successful - ",  loadException ));
+			logger.info(String.format("Loading to target not successful - " +  loadException.getMessage() ));
 		} finally {
-			em.persist(ds);
+			em.merge(ds);
 		}
 		
 
@@ -154,7 +163,7 @@ public class LoadToTarget implements Runnable {
 			if (singletime){
 				String timeCode = (String)times.get(0);
 				List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
-				logger.info("timelist = " + timeList.size());
+			//	logger.info("timelist = " + timeList.size());
 				if (timeList.isEmpty()){
 					StageDimensionalDataPoint tsp = (StageDimensionalDataPoint)results.get(0);
 					singleTim = new TimePeriod();
@@ -162,7 +171,7 @@ public class LoadToTarget implements Runnable {
 					Date startDate = new Date();
 					singleTim.setStartDate(startDate);
 					singleTim.setEndDate(startDate);
-					singleTim.setTimeTypeBean(ttq);
+					singleTim.setTimeTypeBean(tty);
 					if (tsp.getTimeType().equalsIgnoreCase("QUARTER"))
 					{
 						singleTim.setTimeTypeBean(ttq);
@@ -179,9 +188,12 @@ public class LoadToTarget implements Runnable {
 				}
 			}
 
-	//		for (int i = 0; i < results.size(); i++){
-			// just the first 100 for now
-				for (int i = 0; i < 100; i++){
+	//		no more than 600 records allowed!
+			int recstoload = 600;
+			if (results.size() < recstoload){
+				recstoload = results.size();
+		    }
+				for (int i = 0; i < recstoload; i++){
 				StageDimensionalDataPoint sdp = (StageDimensionalDataPoint)results.get(i);
 		    //	1. Create a skeleton dimensional data point record in memory
 				DimensionalDataPoint dp = new DimensionalDataPoint();
@@ -231,10 +243,11 @@ public class LoadToTarget implements Runnable {
 			    	
 		    	}
 		    	String variableName = variableText.toString();
+				logger.info("variableName = " + variableName);
 				List varList =  em.createQuery("SELECT v FROM Variable v WHERE v.name = :vname",Variable.class).setParameter("vname", variableName).getResultList();
 				Variable var = null;
-			//	logger.info("varlist = " + varList.size());
-				
+			//	logger.info("varlist size = " + varList.size());
+			//	int varct = varList.size();
 				if (varList.isEmpty()){
 	    		 var = new Variable();
 		    	 var.setName(variableName);
@@ -269,15 +282,15 @@ public class LoadToTarget implements Runnable {
 					String timeCode = sdp.getTimePeriodCode();
 					List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
 
-		//				logger.info("timelist2 = " + timeList.size());
-				     int timecount = timeList.size();
+					//	logger.info("timelist size = " + timeList.size());
+				 //    int timecount = timeList.size();
 					if (timeList.isEmpty()){
 						tim = new TimePeriod();
 						tim.setName(timeCode);
 						Date startDate = new Date();
 						tim.setStartDate(startDate);
 						tim.setEndDate(startDate);
-						tim.setTimeTypeBean(ttq);
+						tim.setTimeTypeBean(tty);
 						if (sdp.getTimeType().equalsIgnoreCase("QUARTER"))
 						{
 							tim.setTimeTypeBean(ttq);
@@ -299,6 +312,7 @@ public class LoadToTarget implements Runnable {
 				ppk.setGeographicAreaId(geo.getGeographicAreaId());
 				ppk.setTimePeriodId(tim.getTimePeriodId());
 				Population pop = em.find(Population.class,ppk);
+			//	logger.info("population found");
 				if (pop == null){
 					   pop = new Population();
 				//	   pop.setId(ppk);
@@ -311,16 +325,26 @@ public class LoadToTarget implements Runnable {
 				
 				dp.setPopulation(pop);
 				dp.setVariable(var);
+			//	logger.info("DSID = " + dp.getDimensionalDataSet().getDimensionalDataSetId());
+			//	logger.info("AREA = " + dp.getPopulation().getGeographicArea().getGeographicAreaId());
+			//	logger.info("TIME = " + dp.getPopulation().getTimePeriod().getTimePeriodId());
+			//	logger.info("VARI = " + dp.getVariable().getVariableId());
 				em.persist(dp);
-				
 				recct = recct + 1;
-
+	//			Logger.info("Saving record number " + recct);
 			}
-			
+		} catch (PersistenceException e) {
+			logger.error("Database error: " + e.getMessage());
+			throw new GLLoadException("Database error: " + e.getMessage());
+		} catch (DatabaseException e) {
+			logger.error("Database error: " + e.getMessage());
+			throw new GLLoadException("Database error: " + e.getMessage());
+		} catch (CSVValidationException ve) {
+			throw ve;
 		} catch (Exception e) {
-			e.printStackTrace();
+	//		e.printStackTrace();
 			logger.error(String.format("Load to Target failed " + e.getMessage() ));
-			throw new CSVValidationException(String.format("Load to Target failed " + e.getMessage()));
+			throw new GLLoadException(String.format("Load to Target failed " + e.getMessage()));
 
 		}
 	}
