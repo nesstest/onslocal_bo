@@ -12,6 +12,7 @@ public class Dataset {
 	
 	private String id;
     private String title;
+    
     private String filename; 
     private String status;
     
@@ -29,6 +30,7 @@ public class Dataset {
     public void setTitle(String title) {
         this.title = title;
     }
+    
     public String getFilename() {
         return filename;
     }
@@ -63,16 +65,19 @@ public class Dataset {
       Pattern pattern = Pattern.compile("^[a-zA-Z0-9]*$");            
      
       if (id == null || id.length() == 0) {
-        errors.add(new ValidationError("id", "No id was given."));
+        errors.add(new ValidationError("id", "No ID was given."));
       }
       else{
            if (!isAlphaNumeric(id)){
-                  errors.add(new ValidationError("id", "Id not alpha numeric."));
+                  errors.add(new ValidationError("id", "ID must be alpha numeric (spaces not allowed)."));
+           }
+           else if (id.length() > 10) {
+        	   errors.add(new ValidationError("id", "ID must be 10 characters or less."));
            }
       }
 
-      if (!isAlphaNumeric(title)){
-          errors.add(new ValidationError("title", "title not alpha numeric."));
+      if (!isAlphaNumericSpace(title)){
+          errors.add(new ValidationError("title", "Title must be alpha numeric (spaces allowed)."));
       }            
       
       else{
@@ -81,6 +86,7 @@ public class Dataset {
           }
       }            
       
+   
       if(errors.size() > 0){
           return errors;
       }
@@ -96,4 +102,11 @@ public class Dataset {
       }
       return false;   
   }
+    public boolean isAlphaNumericSpace(String s){
+        String pattern= "^[a-zA-Z0-9\\s]*$";
+        if(s.matches(pattern)){
+          return true;
+        }
+        return false;   
+    }    
 }

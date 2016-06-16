@@ -67,7 +67,7 @@ public class MetadataController extends Controller {
     //	return badRequest;
    // 	return ok (ds1.getStatus());
     
-    return ok(views.html.message.render(("Dataset " + dsname + " loaded"), Html.apply("<p>Dataset id: " + dsname + "<br/>JSON: " + json + "</p>")));
+    return ok(views.html.message.render(("Dataset " + dsname + " loaded"), Html.apply("<p>Dataset id: " + dsname + "</p>")));
  }
     
     }
