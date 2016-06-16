@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import models.Dataset;
 import models.Editor;
+import models.Generate;
 import models.Metadata;
 import models.EditAttribs;
 import play.data.Form;
@@ -62,7 +63,13 @@ public class HomeController extends Controller {
     	ed1.setDimdsid(11L); 
         return ok(views.html.edit.render(editForm.fill(ed1)));
    // 	return ok(load.render("Choose a dataset to load."));
-    }    
+    } 
+    
+    public Result generate() {
+    	Form<Generate> genForm = formFactory.form(Generate.class);
+    	Generate gen = new Generate();
+        return ok(views.html.generate.render(genForm.fill(gen)));
+    }
     
     public Result editattribs() {
      	Form<EditAttribs> editAttribsForm = formFactory.form(EditAttribs.class);
