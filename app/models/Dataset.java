@@ -15,8 +15,7 @@ public class Dataset {
     
     private String filename; 
     private String status;
-    
-    
+        
     public String getId() {
         return id;
     }

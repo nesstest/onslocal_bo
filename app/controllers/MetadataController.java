@@ -56,8 +56,7 @@ public class MetadataController extends Controller {
     	MetadataParser mp = new MetadataParser(met1);
 		EntityManager em = jpaApi.em();
         mp.runJPA(em);
-		
-		
+				
    // return ok(dsname + " " + dimdsid + " " + json );
     //	 ValidationError e = new ValidationError("name", "dataset already exist",new ArrayList());
     //	 ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
