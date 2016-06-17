@@ -12,7 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.EntityManager;
+import javax.persistence.SqlResultSetMapping;
 
 import play.*;
 
@@ -49,6 +52,11 @@ public class CSVGenerator implements Runnable {
 	EntityManager em;
 	DimensionalDataSet dds;
 	String outFile;
+	private static String VARIABLE_VALUE_QUERY = "SELECT ga.geographic_area_id, ga.ext_code, ga.name AS area_name, ga.geographic_level_type, ti.time_period_id, ti.name AS time_name, v.variable_id, v.value_domain," +
+			 " v.unit_type, v.name AS variable_name, d.value" +
+			 " FROM onslocal_data_bo.geographic_area ga, onslocal_data_bo.time_period ti, onslocal_data_bo.dimensional_data_point d, onslocal_data_bo.variable v" +
+			 " WHERE ga.geographic_area_id = d.geographic_area_id and d.variable_id = v.variable_id and d.time_period_id = ti.time_period_id" +
+			 " AND d.dimensional_data_set_id = ?1 ORDER BY ga.geographic_area_id, time_name, v.variable_id";
 	/**
 	 * Instantiates a new cSV dataset formatter.
 	 * 
@@ -66,26 +74,150 @@ public class CSVGenerator implements Runnable {
 		run();
 	}
 	
-	public void run(){
+	public void run() {
+		logger.info(String.format("CSV Generation started for DDS Id: %s.", dds.getDimensionalDataSetId()));
 		try {
-	//	File fil =	Play.application().
-		File file = new File(outFile + ".csv");
+			buildCSV();
+		//	this.dataset.setStatus("Loaded to staging");
+			dds.setStatus("5-Generate-OK");
+			logger.info(String.format("CSV Generation completed successfully for DDS Id: %s.", dds.getDimensionalDataSetId()));
+		} catch (CSVValidationException validationException) {
+			// Update status to Observations loading failed
+		//	this.dataset.setStatus("Input file failed validation");
+			dds.setStatus("5-Generate-Failed");
+			dds.setValidationMessage(validationException.getMessage());
+			dds.setValidationException(validationException.getLocalizedMessage());
+			logger.info(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), validationException ));
+		} catch (GLLoadException loadException) {
+			// Update status to Observations loaded
+		//	this.dataset.setStatus("Loading of observations failed");
+			dds.setStatus("5-Generate-Failed");
+			dds.setLoadException(loadException.getMessage());
+			logger.info(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), loadException ));
+		} finally {
+			em.persist(dds);
+		}
+	}
+	
+	
+	public void buildCSV(){
+		try {
+		File file = new File("csvfiles/" + outFile + ".csv");
 		FileOutputStream out = new FileOutputStream(file);
 		out.write(UTF8_BOM);
 		this.output = new CsvWriter(new PrintWriter(new OutputStreamWriter(out,"UTF-8"))); 
+		List<DataDTO> results = getDataRecords(dds.getDimensionalDataSetId());
+		logger.info("records found = " + results.size());
+		writeHeader(results);
+		writeData(results);
+		output.endRow();
 		output.outputField(COPYRIGHT);
 		output.endRow();
 		output.close();
 		} catch (IOException e) {
-		logger.error("Failed to read the input CSV: ", e);
-		throw new GLLoadException("Failed to read/write the input/output CSV: ", e);
+		logger.error("Failed to create the CSV: ", e);
+		throw new GLLoadException("Failed to write the output CSV: ", e);
 	} catch (CSVValidationException ve) {
 		throw ve;
 	} catch (Exception e) {
-		logger.error("Failed to load CSV file: ", e);
-		throw new GLLoadException("Failed to load CSV file due to " + e.getMessage(), e);
+		logger.error("Failed to save CSV file: ", e);
+		throw new GLLoadException("Failed to save CSV file due to " + e.getMessage(), e);
 		}
 	}
+	
+	public void writeHeader(List<DataDTO> results) {
+		output.outputField("Area Code");
+		output.outputField("Area Name");
+		output.outputField("Area Type");
+		output.outputField("Time Period");
+		Boolean samearea = true;
+		Boolean sametime = true;
+		String areaCode = "START";
+		String timeCode = "START";
+		int i = 0;
+		while (samearea && sametime ){
+			DataDTO curData = (DataDTO)(results.get(i));
+			String heading = curData.getVariableName();
+		//	logger.info("heading = " + heading);
+			output.outputField(heading);
+			String nextAreaCode = curData.getExtCode();
+	//		logger.info("areaCode = " + nextAreaCode);
+			String nextTimeCode = curData.getTimeName();
+		//	logger.info("timeCode = " + nextTimeCode);
+			if (areaCode.equals("START")){
+				areaCode = nextAreaCode;
+			}
+			if (timeCode.equals("START")){
+				timeCode = nextTimeCode;
+			}
+			if (!areaCode.equals(nextAreaCode)){
+				samearea = false;
+			}
+			if (!timeCode.equals(nextTimeCode)){
+				sametime = false;
+			}
+			i++;
+		}
+		output.endRow();
+	}
+	
+	public void writeData(List<DataDTO> results) {
+		int i=0;
+		while ( i < results.size() ){
+			DataDTO curData = (DataDTO)(results.get(i));
+			String areaCode = curData.getExtCode();
+			String areaName = curData.getAreaName();
+			String areaType = curData.getGeographicLevelType();
+			String timeCode = curData.getTimeName();
+			output.outputField(areaCode);
+			output.outputField(areaName);
+			output.outputField(areaType);
+			output.outputField(timeCode);
+			Boolean samearea = true;
+			Boolean sametime = true;
+			while (sametime & samearea & i < results.size() )
+			{
+				BigDecimal value = curData.getValue();
+				String sValue =  String.valueOf(value);
+				output.outputField(sValue);
+				i++;
+				if (i == results.size())
+				{
+					sametime = false;
+				}
+				else
+				{
+					curData = (DataDTO)(results.get(i));
+					String nextAreaCode = curData.getExtCode();
+					String nextTimeCode = curData.getTimeName();
+			//		logger.info("timeCode = " + nextTimeCode);
+					if (!areaCode.equals(nextAreaCode)){
+						samearea = false;
+					}
+					if (!timeCode.equals(nextTimeCode)){
+						sametime = false;
+					}
+				}
+			}
+			output.endRow();
+
+		}
+		output.endRow();
+	}
+
+	
+	
+	public List<DataDTO> getDataRecords(Long ddsId)
+	{
+		
+		@SuppressWarnings("unchecked")
+		List<DataDTO> results = (List<DataDTO>) em
+				.createNativeQuery(VARIABLE_VALUE_QUERY, "DataTableResult")
+				.setParameter(1, new Long(ddsId)).getResultList();
+		
+		return results;
+	}
+	
 	/**
 	@Override
 	public void start(StartDetails details) throws Exception {

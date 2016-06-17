@@ -1,6 +1,8 @@
 package models;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -12,6 +14,19 @@ import java.util.List;
 @Entity
 @Table(name="geographic_area")
 @NamedQuery(name="GeographicArea.findAll", query="SELECT g FROM GeographicArea g")
+@SqlResultSetMapping(name = "DataTableResult", classes = {
+		@ConstructorResult(targetClass = DataDTO.class,	columns = {
+				@ColumnResult(name = "geographic_area_id", type=Long.class),
+				@ColumnResult(name = "ext_code"), 
+				@ColumnResult(name = "area_name"),
+				@ColumnResult(name = "geographic_level_type"),
+				@ColumnResult(name = "time_period_id", type=Long.class),
+				@ColumnResult(name = "time_name"),			
+				@ColumnResult(name = "variable_id", type=Long.class),
+				@ColumnResult(name = "value_domain"),
+				@ColumnResult(name = "unit_type"),
+				@ColumnResult(name = "variable_name"),
+				@ColumnResult(name = "value", type=BigDecimal.class) }) })
 public class GeographicArea implements Serializable {
 	private static final long serialVersionUID = 1L;
 

@@ -60,7 +60,7 @@ public class GenerateController extends Controller {
 	
         response().setContentType("application/x-download");  
         response().setHeader("Content-disposition","attachment; filename=" + dsname + ".csv"); 
-        return ok(new File(dsname + ".csv"));
+        return ok(new File("csvfiles/" + dsname + ".csv"));
    //     return ok(views.html.message.render(("Dataset " + dsname + " loaded to target"), Html.apply("<p>Dataset id: " + dsname + "</p>")));
    	 }		
    // return ok(dsname + " " + dimdsid + " " + task );
