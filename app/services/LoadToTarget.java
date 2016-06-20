@@ -259,7 +259,9 @@ public class LoadToTarget implements Runnable {
 		    		//	variableName = variableName + " | ";
 		    		}
 		    	}
-		    	variableName = variableText.toString();
+		    	for (int l=1; l < 10; l++){
+		    		variableName = variableText.toString();
+		    	}
 		//		logger.info("variableName = " + variableName);
 				List varList =  em.createQuery("SELECT v FROM Variable v WHERE v.name = :vname",Variable.class).setParameter("vname", variableName).getResultList();
 				Variable var = null;
