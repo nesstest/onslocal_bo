@@ -15,6 +15,7 @@ import exceptions.GLLoadException;
 import models.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class LoadToTarget implements Runnable {
 	Boolean singlearea;
 	Boolean singletime;
 	Long recct;
+	String variableName;
 	public LoadToTarget(Editor ed) {
 		this.ddsid = ed.getDimdsid();
 		this.dsname = ed.getDsname();
@@ -140,7 +142,7 @@ public class LoadToTarget implements Runnable {
 			   em.persist(tty);
 			}
 			
-			List results =  em.createQuery("SELECT s FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
+			List results =  em.createQuery("SELECT s FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid +" order by s.geographicArea, s.timePeriodCode", StageDimensionalDataPoint.class).getResultList();
 			logger.info("records found = " + results.size());
 			recct = 0L;
 			
@@ -203,19 +205,25 @@ public class LoadToTarget implements Runnable {
 		    //	2. Fetch the staged category records for current observation seq id
 				List<StageCategory> clist = sdp.getStageCategories();
 		
-				StringBuffer variableText = new StringBuffer("");
+			//	StringBuilder variableText = new StringBuilder("");
+			//	String variableName = "";
 		    //	3. For each staged category record
+				ArrayList <Category> vcatList = new ArrayList<Category>();
 		    	for (int j = 0; j < clist.size(); j++){
-	    	//	3.1. Try to fetch the concept id, if not found create new concept
+	    	
+		    		
+		    		//	3.1. Try to fetch the concept id, if not found create new concept
 		       		StageCategory scat = clist.get(j);
 		    //		logger.info("catno = " + scat.getId().getDimensionNumber());
 		    		String conceptName = scat.getConceptSystemLabelEng();
 	    	//	3.2. Try to fetch the category id, if not found create new category
 		    		String categoryName = scat.getCategoryNameEng();
-		    		variableText.append(categoryName);
-		    		if (j < clist.size()-1){
-		    			variableText.append(" | ");
-		    		}
+		    	//	variableText.append(categoryName);
+		    	//	variableName = variableName + categoryName;
+		    	//	if (j < clist.size()-1){
+		    	//		variableText.append(" | ");
+		    		//	variableName = variableName + " | ";
+		    	//	}
 		    	//	logger.info("catname = " + categoryName);
 
 					List catList =  em.createQuery("SELECT c FROM Category c WHERE c.name = :cname",Category.class).setParameter("cname", categoryName).getResultList();
@@ -224,26 +232,35 @@ public class LoadToTarget implements Runnable {
 					if (catList.isEmpty()){
 		    		 cat = new Category();
 			    	 cat.setName(categoryName);
+			    	 ConceptSystem consys = em.find(ConceptSystem.class, conceptName);
+			    	 	if (consys == null){		
+			    			consys = new ConceptSystem();
+				    		consys.setConceptSystem(conceptName);
+				    		em.persist(consys);
+			    		}
+			    	cat.setConceptSystemBean(consys);
+			    	em.persist(cat);
 		    		}
 		    		else
 		    		{
 		    			cat = (Category)catList.get(0);
 		    		}
-	    		
-		    		ConceptSystem consys = em.find(ConceptSystem.class, conceptName);
-		    		if (consys == null){		
-		    			consys = new ConceptSystem();
-			    		consys.setConceptSystem(conceptName);
-		    		}
-		    		cat.setConceptSystemBean(consys);
-		    		em.persist(cat);
-//		    		consys.addCategory(cat);
-		    		em.persist(consys);
+					vcatList.add(cat);
 				    //  	4. If no new items created in 3.1 and 3.2, fetch the variable id for the combo, else create a variable and a set of variablecategory records for it		    	
 			    	
 		    	}
-		    	String variableName = variableText.toString();
-				logger.info("variableName = " + variableName);
+		    		    	
+		    	StringBuilder variableText = new StringBuilder("");
+		    	for (int k = 0; k < vcatList.size(); k++){
+		    	variableText.append(vcatList.get(k).getName());
+		    	//	variableName = variableName + categoryName;
+		    		if (k < vcatList.size()-1){
+		    			variableText.append(" | ");
+		    		//	variableName = variableName + " | ";
+		    		}
+		    	}
+		    	variableName = variableText.toString();
+		//		logger.info("variableName = " + variableName);
 				List varList =  em.createQuery("SELECT v FROM Variable v WHERE v.name = :vname",Variable.class).setParameter("vname", variableName).getResultList();
 				Variable var = null;
 			//	logger.info("varlist size = " + varList.size());
@@ -334,10 +351,12 @@ public class LoadToTarget implements Runnable {
 	//			Logger.info("Saving record number " + recct);
 			}
 		} catch (PersistenceException e) {
+			logger.info("variable name = " + variableName);
 			logger.error("Database error: " + e.getMessage());
 			throw new GLLoadException("Database error: " + e.getMessage());
 		} catch (DatabaseException e) {
 			logger.error("Database error: " + e.getMessage());
+			logger.info("variable name = " + variableName);
 			throw new GLLoadException("Database error: " + e.getMessage());
 		} catch (CSVValidationException ve) {
 			throw ve;
