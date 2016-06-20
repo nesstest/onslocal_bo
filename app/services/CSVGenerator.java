@@ -56,7 +56,7 @@ public class CSVGenerator implements Runnable {
 			 " v.unit_type, v.name AS variable_name, d.value" +
 			 " FROM onslocal_data_bo.geographic_area ga, onslocal_data_bo.time_period ti, onslocal_data_bo.dimensional_data_point d, onslocal_data_bo.variable v" +
 			 " WHERE ga.geographic_area_id = d.geographic_area_id and d.variable_id = v.variable_id and d.time_period_id = ti.time_period_id" +
-			 " AND d.dimensional_data_set_id = ?1 ORDER BY ga.geographic_area_id, time_name, v.variable_id";
+			 " AND d.dimensional_data_set_id = ?1 ORDER BY ga.geographic_area_id, time_name, variable_name";
 	/**
 	 * Instantiates a new cSV dataset formatter.
 	 * 
@@ -110,9 +110,9 @@ public class CSVGenerator implements Runnable {
 		logger.info("records found = " + results.size());
 		writeHeader(results);
 		writeData(results);
-		output.endRow();
-		output.outputField(COPYRIGHT);
-		output.endRow();
+	//	output.endRow();
+	//	output.outputField(COPYRIGHT);
+	//	output.endRow();
 		output.close();
 		} catch (IOException e) {
 		logger.error("Failed to create the CSV: ", e);
@@ -139,7 +139,6 @@ public class CSVGenerator implements Runnable {
 			DataDTO curData = (DataDTO)(results.get(i));
 			String heading = curData.getVariableName();
 		//	logger.info("heading = " + heading);
-			output.outputField(heading);
 			String nextAreaCode = curData.getExtCode();
 	//		logger.info("areaCode = " + nextAreaCode);
 			String nextTimeCode = curData.getTimeName();
@@ -155,6 +154,9 @@ public class CSVGenerator implements Runnable {
 			}
 			if (!timeCode.equals(nextTimeCode)){
 				sametime = false;
+			}
+			if (sametime && samearea){
+				output.outputField(heading);
 			}
 			i++;
 		}
@@ -179,7 +181,7 @@ public class CSVGenerator implements Runnable {
 			{
 				BigDecimal value = curData.getValue();
 				String sValue =  String.valueOf(value);
-				output.outputField(sValue);
+				output.outputNum(sValue);
 				i++;
 				if (i == results.size())
 				{
@@ -428,6 +430,18 @@ public class CSVGenerator implements Runnable {
 			firstColumn = false;
 			print(contents);
 		}
+		
+		public void outputNum(String contents) {
+		//	if (contents.length() > 0) {
+		//		contents = contents.replace(DOUBLE_QUOTE, DOUBLE_QUOTE + DOUBLE_QUOTE);
+		//		contents = DOUBLE_QUOTE + contents + DOUBLE_QUOTE;
+		//	}
+			if (!firstColumn) {
+				print(COMMA);
+			}
+			firstColumn = false;
+			print(contents);
+		}	
 
 		public void endRow() {
 			firstColumn = true;
