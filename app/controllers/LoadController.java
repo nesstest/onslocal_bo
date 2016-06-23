@@ -69,7 +69,9 @@ public class LoadController extends Controller {
    		  em.persist(drs);
    		  em.persist(dds);   
        	  inputCSV.runJPA(em, dds);
-      
+       	  em.flush();
+       	  em.clear();
+       	  
          //return ok(id + " " + title + " " + filename + " " + form.getStatus());
          
          return ok(views.html.message.render((id + " " + form.getStatus()), Html.apply("<p>Dataset id: " + id + "<br/>Dataset title: " + title + "<br/>Filename: " + fileName + "<br/>Status: " + form.getStatus() + "</p>")));

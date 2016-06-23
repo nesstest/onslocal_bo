@@ -190,8 +190,8 @@ public class LoadToTarget implements Runnable {
 				}
 			}
 
-	//		no more than 600 records allowed!
-			int recstoload = 600;
+	//		no more than 1000 records allowed!
+			int recstoload = 1000;
 			if (results.size() < recstoload){
 				recstoload = results.size();
 		    }
@@ -204,7 +204,7 @@ public class LoadToTarget implements Runnable {
 				
 		    //	2. Fetch the staged category records for current observation seq id
 				List<StageCategory> clist = sdp.getStageCategories();
-		
+		//		logger.info("clist = " + clist.size());	
 		    //	3. For each staged category record
 				ArrayList <Category> vcatList = new ArrayList<Category>();
 		    	for (int j = 0; j < clist.size(); j++){
@@ -249,9 +249,14 @@ public class LoadToTarget implements Runnable {
 		    		//	variableName = variableName + " | ";
 		    		}
 		    	}
-		    	for (int l=1; l < 50; l++){
-		    		variableName = variableText.toString();
-		    	}
+		    	variableName = variableText.toString();
+		   // 	for (int l=1; l < 5000; l++){
+		    //		variableName = variableText.toString();
+		    //		if (variableName.length() > 0){
+		    //			logger.info("breaking #" + l);
+		    //			break;
+		    //		}
+		   // 	}
 		//		logger.info("variableName = " + variableName);
 				List varList =  em.createQuery("SELECT v FROM Variable v WHERE v.name = :vname",Variable.class).setParameter("vname", variableName).getResultList();
 				Variable var = null;
