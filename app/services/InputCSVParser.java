@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,17 +56,8 @@ public class InputCSVParser implements Runnable {
     private static final Logger.ALogger logger = Logger.of(InputCSVParser.class);
 	/** The Constant END_OF_FILE. */
 	static final String END_OF_FILE = "*********";
-	private static final String DIMENSION_TYPE_LOCATION = "Location";
-	private static final int INDEX_SEGMENT_POPULATION = 23;
-	private static final int INDEX_UNIT_MEASURE = 10;
-	private static final int INDEX_SCALAR = 9;
-	private static final int INDEX_MEASURE_TYPE = 4;
-	private static final int INDEX_MEASURES_DIMENSION_WELSH = 3;
-	private static final int INDEX_MEASURES_DIMENSION = 2;
-	private static final String TIME = "Time";
 	private static final int TIME_DIMENSION_ITEM_INDEX = 17;
 	private static final int GEOG_AREA_CODE_INDEX = 14;
-	private static final int DIMENSION_DETAILS_START_INDEX = 35;
 	private static final int CSV_DIM_ITEM_COLUMN_COUNT = 8;
 	private static final int CSV_MIN_COLUMN_COUNT = 43;
 	private static final int ATTR_STAT_UNIT_ENGLISH = 2;
@@ -116,21 +108,25 @@ public class InputCSVParser implements Runnable {
 	public void run() {
 		logger.info(String.format("File loading started for the Job Id: %s.", jobId));
 		try {
+			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+			dds.setModified(timeStamp);
+			dds.setValidationException("");
+			dds.setLoadException("");
+			dds.setValidationMessage("Success");
 			parseCSV();
 			this.dataset.setStatus("Loaded to staging");
 			dds.setStatus("1-Staging-OK");
 			logger.info(String.format("Observations successfully loaded for Job %s.", jobId));
 		} catch (CSVValidationException validationException) {
-			// Update status to Observations loading failed
 			this.dataset.setStatus("Input file failed validation");
 			dds.setStatus("1-Staging-Failed");
 			dds.setValidationMessage(validationException.getMessage());
 			dds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("Observations file failed validation for Job %s : %s", jobId, validationException ));
 		} catch (GLLoadException loadException) {
-			// Update status to Observations loaded
 			this.dataset.setStatus("Loading of observations failed");
 			dds.setStatus("1-Staging-Failed");
+			dds.setValidationException(loadException.getMessage());
 			dds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading of observations into staging was not successful for Job %s : %s", jobId, loadException ));
 		} finally {
@@ -200,7 +196,6 @@ public class InputCSVParser implements Runnable {
 			CSVParser csvParser = new CSVParser();
 			if (csvReader != null) {
 				try {
-					// csvReader.readNext();
 					csvReader.readLine();
 					long rowCount = 0L;
 					while (csvReader.ready() && (rowData = csvParser.parseLine(csvReader.readLine())) != null) {
@@ -263,14 +258,6 @@ public class InputCSVParser implements Runnable {
 						// Classification item Time data
 						String timeClItemCode = (rowData[TIME_DIMENSION_ITEM_INDEX] == null ? rowData[TIME_DIMENSION_ITEM_INDEX] : Utility.removeCommaEqualApostrophe(rowData[TIME_DIMENSION_ITEM_INDEX]));
 						if (timeClItemCode != null && timeClItemCode.length() > 0) {
-							// Time code NB database should allow alphanumeric
-						//	if (StringUtils.isNumeric(timeClItemCode)){
-						//	stageObs.setTimePeriodId(Long.valueOf(timeClItemCode).longValue());
-						//	}
-						//	else
-						//	{
-						//		stageObs.setTimePeriodId(0L);
-						//	}
 							stageObs.setTimePeriodCode(timeClItemCode);
 							stageObs.setTimePeriodId(0L);
 						} else {
@@ -292,12 +279,12 @@ public class InputCSVParser implements Runnable {
 						int dimSub = 0;
 						while (rowSub < rowLength) {
 	//					logger.info("rowsub = " + rowSub);
-							// create new category
+						// create new category
 						StageCategory stageCat = new StageCategory();
 						StageCategoryPK catPK = new StageCategoryPK();
 						Long seqNum = stageObs.getObservationSeqId();
 						catPK.setObservationSeqId(seqNum);
-					//	logger.info("seqid=" + stageObs.getObservationSeqId());
+						//	logger.info("seqid=" + stageObs.getObservationSeqId());
 						catPK.setDimensionNumber(dimSub);
 						stageCat.setId(catPK);
 						dimSub++;
@@ -325,9 +312,7 @@ public class InputCSVParser implements Runnable {
 						rowSub = rowSub + 4;
 						em.persist(stageCat);
 						}
-						
-						
-						
+								
 					}
 					if (!END_OF_FILE.equals(firstCellVal)) {
 						throw new GLLoadException("End of File record not found");
@@ -382,23 +367,6 @@ public class InputCSVParser implements Runnable {
 		}
 	}
 	
-	/**
-	 * Retrieves folder path for the current business area
-	 * 
-	 * @param businessArea
-	 * @return String file path
-	 */
-//	public String getCSVFilePath() {
-//		String filePath = null;
-//		WdaBusinessData wdaBusinessData = businessDataDao.findByBusinessArea(this.busAreaName);
-//		String key = null;
-//		if (wdaBusinessData != null && wdaBusinessData.getBusinessArea() != null && wdaBusinessData.getFileOrigin() != null) {
-//			key = wdaBusinessData.getFileOrigin() + ".GENERALLOAD.PROCESSING_DIRECTORY";
-//			filePath = ONSProperties.getString(key);
-//		}
-//		return (filePath == null) ? "" : filePath;
-//	}
-
 	public List getGeogItemMapAsList(Map map) {
 		List list = new ArrayList();
 		if (map != null && map.size() > 0) {

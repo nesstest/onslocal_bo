@@ -17,16 +17,18 @@
 	<div> 
 	
 	    <table border=1 class="table">
-	        <thead><th>Resource ID</th><th>DimDataset ID</th><th>Status</th><th>Validation Exception</th><th>Load Exception</th></thead>
+	        <thead><th>Dataset ID</th><th>Status</th><th>Last Updated</th><th>Num Obs</th><th>Error Message</th></thead>
 	        <tbody>
 	@for(dataset <- datasetList){
 	
 	        <tr>
 	         <td>@dataset.getDataResourceBean().getDataResource()</td>
-	         <td>@dataset.getDimensionalDataSetId()</td>
+	  <!--        <td>@dataset.getDimensionalDataSetId()</td> --> 
 	         <td>@dataset.getStatus()</td>
+	         <td>@dataset.getModified()</td>
+	         <td>@dataset.getObscount()</td>
 	         <td>@dataset.getValidationException()</td>
-	         <td>@dataset.getLoadException()</td>
+	 <!--          <td>@dataset.getLoadException()</td> -->
 	         </tr>
 	         }
 	        </tbody>

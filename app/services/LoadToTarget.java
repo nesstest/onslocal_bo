@@ -15,6 +15,7 @@ import exceptions.GLLoadException;
 import models.*;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,32 +49,31 @@ public class LoadToTarget implements Runnable {
 		logger.info(String.format("Loading to Target started for dataset id " + ddsid + " (" +dsname+")"));
 		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
-			ds.setStatus("2-Target-Failed");
-			ds.setValidationMessage(null);
-			ds.setValidationException(null);
-			ds.setLoadException(null);
+			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+			ds.setModified(timeStamp);
+			//ds.setStatus("2-Target-Failed");
+			ds.setValidationMessage("");
+			ds.setValidationException("");
+			ds.setLoadException("");
 			em.merge(ds);
 			StageToTarget(ds);
 			logger.info("loaded " + recct + " records");
 			ds.setStatus("2-Target-OK");
 			ds.setObscount(recct);
-		//	this.dataset.setStatus("Loaded to staging");
 			logger.info(String.format("Load to Target successful"));
 		} catch (CSVValidationException validationException) {
-	//		this.dataset.setStatus("Input file failed validation");
 			ds.setStatus("2-Target-Failed");
 			ds.setValidationMessage(validationException.getMessage());
 			ds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("Loading to target not successful - " + validationException.getMessage() ));
 		} catch (GLLoadException loadException) {
-		//	this.dataset.setStatus("Loading of observations failed");
 			ds.setStatus("2-Target-Failed");
+			ds.setValidationException(loadException.getMessage());
 			ds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading to target not successful - " +  loadException.getMessage() ));
 		} finally {
 			em.merge(ds);
 		}
-		
 
 	}
 	
@@ -205,27 +205,17 @@ public class LoadToTarget implements Runnable {
 		    //	2. Fetch the staged category records for current observation seq id
 				List<StageCategory> clist = sdp.getStageCategories();
 		
-			//	StringBuilder variableText = new StringBuilder("");
-			//	String variableName = "";
 		    //	3. For each staged category record
 				ArrayList <Category> vcatList = new ArrayList<Category>();
 		    	for (int j = 0; j < clist.size(); j++){
 	    	
 		    		
-		    		//	3.1. Try to fetch the concept id, if not found create new concept
+		    //	3.1. Try to fetch the concept id, if not found create new concept
 		       		StageCategory scat = clist.get(j);
 		    //		logger.info("catno = " + scat.getId().getDimensionNumber());
 		    		String conceptName = scat.getConceptSystemLabelEng();
 	    	//	3.2. Try to fetch the category id, if not found create new category
 		    		String categoryName = scat.getCategoryNameEng();
-		    	//	variableText.append(categoryName);
-		    	//	variableName = variableName + categoryName;
-		    	//	if (j < clist.size()-1){
-		    	//		variableText.append(" | ");
-		    		//	variableName = variableName + " | ";
-		    	//	}
-		    	//	logger.info("catname = " + categoryName);
-
 					List catList =  em.createQuery("SELECT c FROM Category c WHERE c.name = :cname",Category.class).setParameter("cname", categoryName).getResultList();
 					Category cat = null;
 			//		logger.info("catlist = " + catList.size());
@@ -246,7 +236,7 @@ public class LoadToTarget implements Runnable {
 		    			cat = (Category)catList.get(0);
 		    		}
 					vcatList.add(cat);
-				    //  	4. If no new items created in 3.1 and 3.2, fetch the variable id for the combo, else create a variable and a set of variablecategory records for it		    	
+			    //  	4. If no new items created in 3.1 and 3.2, fetch the variable id for the combo, else create a variable and a set of variablecategory records for it		    	
 			    	
 		    	}
 		    		    	
@@ -259,7 +249,7 @@ public class LoadToTarget implements Runnable {
 		    		//	variableName = variableName + " | ";
 		    		}
 		    	}
-		    	for (int l=1; l < 10; l++){
+		    	for (int l=1; l < 50; l++){
 		    		variableName = variableText.toString();
 		    	}
 		//		logger.info("variableName = " + variableName);
@@ -302,7 +292,6 @@ public class LoadToTarget implements Runnable {
 					List timeList =  em.createQuery("SELECT t FROM TimePeriod t WHERE t.name = :tcode",TimePeriod.class).setParameter("tcode", timeCode).getResultList();
 
 					//	logger.info("timelist size = " + timeList.size());
-				 //    int timecount = timeList.size();
 					if (timeList.isEmpty()){
 						tim = new TimePeriod();
 						tim.setName(timeCode);
@@ -363,7 +352,6 @@ public class LoadToTarget implements Runnable {
 		} catch (CSVValidationException ve) {
 			throw ve;
 		} catch (Exception e) {
-	//		e.printStackTrace();
 			logger.error(String.format("Load to Target failed " + e.getMessage() ));
 			throw new GLLoadException(String.format("Load to Target failed " + e.getMessage()));
 

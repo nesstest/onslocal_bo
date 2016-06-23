@@ -60,7 +60,9 @@ public class GenerateController extends Controller {
 	
         response().setContentType("application/x-download");  
         response().setHeader("Content-disposition","attachment; filename=" + dsname + ".csv"); 
-        return ok(new File("csvfiles/" + dsname + ".csv"));
+		File file = Play.application().getFile("/logs/" + dsname + ".csv");
+     //   return ok(new File("/logs/" + dsname + ".csv"));
+		return ok(file);
    //     return ok(views.html.message.render(("Dataset " + dsname + " loaded to target"), Html.apply("<p>Dataset id: " + dsname + "</p>")));
    	 }		
    // return ok(dsname + " " + dimdsid + " " + task );

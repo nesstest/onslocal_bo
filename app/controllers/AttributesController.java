@@ -9,7 +9,9 @@ import models.*;
 import play.data.FormFactory;
 import play.data.validation.ValidationError;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.*;
@@ -40,13 +42,13 @@ public class AttributesController extends Controller {
     	Attribs a1 = new Attribs();
     	List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", datasetid).getResultList();
     	Logger.info("datasetid = " + datasetid);
-    	Logger.info("size = " + dis.size());
+   // 	Logger.info("size = " + dis.size());
     	DataResource drs = dis.get(0);
     	a1.setColumn_concept(drs.getColumnConcept());
     	a1.setRow_concept(drs.getRowConcept());
     	a1.setDataResource(datasetid);
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();
-    	Logger.info("size2 = " + dimds.size());
+   // 	Logger.info("size2 = " + dimds.size());
     	datasetdefid = dimds.get(0).getDimensionalDataSetId();
     	ArrayList<String> conList = new ArrayList<String>();
     	List <ConceptSystem> cons = em.createQuery("SELECT c FROM ConceptSystem c",ConceptSystem.class).getResultList();
@@ -76,12 +78,17 @@ public class AttributesController extends Controller {
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dimensionalDataSetId = :dsid",DimensionalDataSet.class).setParameter("dsid", datasetdefid).getResultList();
     	DimensionalDataSet ds = dimds.get(0);
     	try {
+			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+			ds.setModified(timeStamp);
+			ds.setValidationException("");
+			ds.setLoadException("");
+			ds.setValidationMessage("Success");
         	ds.setStatus("3-Attributes-OK");
     		List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", datasetid).getResultList();
     		DataResource drs = dis.get(0);
     		drs.setRowConcept(a1.getRow_concept());
     		drs.setColumnConcept(a1.getColumn_concept());
-    		em.persist(drs);
+    		em.merge(drs);
     	}
 	    catch (Exception e) {
 	    	e.printStackTrace();
@@ -90,7 +97,7 @@ public class AttributesController extends Controller {
 	    	ds.setValidationException(String.format("Edit Attributes Failed " + e.getMessage()));
 	}
 	 finally {
-		em.persist(ds);
+		em.merge(ds);
 	}
 		return ok(views.html.message.render(("Attributes updated"), Html.apply("<p>Column Concept: " + a1.getColumn_concept() + "<br/>Row Concept: " + a1.getRow_concept() + "</p>")));
 

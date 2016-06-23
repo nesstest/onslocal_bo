@@ -9,6 +9,8 @@ import exceptions.CSVValidationException;
 import exceptions.GLLoadException;
 import models.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.*;
@@ -45,23 +47,27 @@ public class MetadataParser implements Runnable {
 	
 		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
+			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+			ds.setModified(timeStamp);
+			ds.setValidationException("");
+			ds.setLoadException("");
+			ds.setValidationMessage("Success");
 			parseJSON(ds);
+			ds.setModified(timeStamp);
 			ds.setStatus("4-Metadata-OK");
-		//	this.dataset.setStatus("Loaded to staging");
 			logger.info(String.format("JSON successfully loaded"));
 		} catch (CSVValidationException validationException) {
 			ds.setStatus("4-Metadata-Failed");
 			ds.setValidationMessage(validationException.getMessage());
 			ds.setValidationException(validationException.getLocalizedMessage());
-	//		this.dataset.setStatus("Input file failed validation");
 			logger.info(String.format("Metadata file failed validation - " + validationException.getMessage() ));
 		} catch (GLLoadException loadException) {
-		//	this.dataset.setStatus("Loading of observations failed");
 			ds.setStatus("4-Metadata-Failed");
+			ds.setValidationException(loadException.getMessage());
 			ds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading of metadata was not successful - ",  loadException ));
 		} finally {
-			em.persist(ds);
+			em.merge(ds);
 		}
 	}
 	

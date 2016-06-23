@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +43,7 @@ public class CSVGenerator implements Runnable {
 	protected static final String GEOGRAPHIC_AREA = "Geographic Area";
 	protected static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 	protected CsvWriter output;
-//	protected StartDetails startDetails;
-//	protected Language language;
-//	protected GeogObservations<String> geogObservations;
 	protected Map<Long, Integer> offsetForDimItemSetId = new HashMap<Long, Integer>();
-//	protected WdaObservationType obsType;
 	protected boolean isGeogSig = true;
 	protected String timeDimensionTitle = null;
 	EntityManager em;
@@ -78,20 +75,21 @@ public class CSVGenerator implements Runnable {
 		logger.info(String.format("CSV Generation started for DDS Id: %s.", dds.getDimensionalDataSetId()));
 		try {
 			buildCSV();
-		//	this.dataset.setStatus("Loaded to staging");
+			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+			dds.setModified(timeStamp);
+			dds.setValidationException("");
+			dds.setLoadException("");
+			dds.setValidationMessage("Success");
 			dds.setStatus("5-Generate-OK");
 			logger.info(String.format("CSV Generation completed successfully for DDS Id: %s.", dds.getDimensionalDataSetId()));
 		} catch (CSVValidationException validationException) {
-			// Update status to Observations loading failed
-		//	this.dataset.setStatus("Input file failed validation");
 			dds.setStatus("5-Generate-Failed");
 			dds.setValidationMessage(validationException.getMessage());
 			dds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), validationException ));
 		} catch (GLLoadException loadException) {
-			// Update status to Observations loaded
-		//	this.dataset.setStatus("Loading of observations failed");
 			dds.setStatus("5-Generate-Failed");
+			dds.setValidationException(loadException.getMessage());
 			dds.setLoadException(loadException.getMessage());
 			logger.info(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), loadException ));
 		} finally {
@@ -102,7 +100,8 @@ public class CSVGenerator implements Runnable {
 	
 	public void buildCSV(){
 		try {
-		File file = new File("csvfiles/" + outFile + ".csv");
+	//	File file = new File("/logs/" + outFile + ".csv");
+		File file = Play.application().getFile("/logs/" + outFile + ".csv");
 		FileOutputStream out = new FileOutputStream(file);
 		out.write(UTF8_BOM);
 		this.output = new CsvWriter(new PrintWriter(new OutputStreamWriter(out,"UTF-8"))); 
@@ -220,194 +219,7 @@ public class CSVGenerator implements Runnable {
 		return results;
 	}
 	
-	/**
-	@Override
-	public void start(StartDetails details) throws Exception {
-		// Save start details
-		//
-		this.startDetails = details;
-		WdaDatasetDefintion wdaDatasetDefintion = details.getWdaDatasetDefintion();
-		WdaObservation observationForObsType = details.getWdaObservationDAO().getObservationForObsType(wdaDatasetDefintion.getDatasetDefinitionId());
-		if (null != observationForObsType) {
-			this.obsType = observationForObsType.getObsType();
-		}
-		// Output file header
-		WdaDatasetCollection wdaDatasetCollection = wdaDatasetDefintion.getWdaDatasetCollection();
-		output.outputField(wdaDatasetDefintion.getDatasetid());
-		output.endRow();
-		output.outputField(language.choose(wdaDatasetCollection.getCollectionTitle(), wdaDatasetCollection.getWelshCollectionTitle()));
-		output.endRow();
-		output.outputField(wdaDatasetDefintion.getDatasetDifferentiator() == null ? "" : wdaDatasetDefintion.getDatasetDifferentiator());
-		output.endRow();
-		output.outputField(wdaDatasetDefintion.getPublicationDate() == null ? "" : dateFormat.format(wdaDatasetDefintion.getPublicationDate()));
-		output.endRow();
-		output.endRow();
-		// Get title details
-		//
-		List<String> measureTypes = new ArrayList<String>();
-		List<String> statisticalUnits = new ArrayList<String>();
-		List<String> dimTitles = new ArrayList<String>();
-		List<String> dimItemTitles = new ArrayList<String>();
-		determineTitles(measureTypes, statisticalUnits, dimTitles, dimItemTitles);
-		// Output the measure types
-		//
-		if (!isGeogSig) {
-			output.outputField("");
-		}
-		output.outputField("");
-		output.outputField("");
-		for (String measureType : measureTypes) {
-			output.outputField(measureType);
-		}
-		output.endRow();
-		// Output the statistical units
-		//
-		if (!isGeogSig) {
-			output.outputField("");
-		}
-		output.outputField("");
-		output.outputField("");
-		for (String statisticalUnit : statisticalUnits) {
-			output.outputField(statisticalUnit);
-		}
-		output.endRow();
-		// Output the dimension titles
-		//
-		if (!isGeogSig) {
-			output.outputField("");
-		}
-		output.outputField("");
-		output.outputField("");
-		for (String dimTitle : dimTitles) {
-			output.outputField(dimTitle);
-		}
-		output.endRow();
-		// Output the dimension item titles
-		//
-		if (!isGeogSig) {
-			printTimeDimensionTitle(wdaDatasetDefintion);
-		}
-		output.outputField(language.choose(GEOGRAPHIC_ID));
-		output.outputField(language.choose(GEOGRAPHIC_AREA));
-		for (String dimItemTitle : dimItemTitles) {
-			output.outputField(dimItemTitle);
-		}
-		output.endRow();
-		this.geogObservations = new GeogObservations<String>(details.getSegmentDetails(), dimItemTitles.size(), null, String.class);
-	}
 
-	private void printTimeDimensionTitle(WdaDatasetDefintion wdaDatasetDefintion) {
-		if (timeDimensionTitle == null) { // If title not found in dim item sets
-			// Find time dimension
-			for (WdaDimension dimension : wdaDatasetDefintion.getWdaDimensions()) {
-				if ("Time".equals(dimension.getDimensionType())) {
-					timeDimensionTitle = language.choose(dimension.getDimensionTitle(), dimension.getWelshDimensionTitle());
-					break;
-				}
-			}
-		}
-		output.outputField(timeDimensionTitle);
-	}
-
-	@Override
-	public void end(EndDetails details, Throwable callbackException) throws Throwable {
-		super.end(details, callbackException);
-		output.outputField(COPYRIGHT);
-		output.endRow();
-		output.close();
-	}
-
-	
-	@Override
-	public void geogStart(GeogDetails details) throws Throwable {
-		output.outputField(details.getGeogCode());
-		output.outputField(language.choose(details.getGeogLabel(), details.getGeogLabelWelsh()));
-	}
-
-	@Override
-	public void geogEnd() throws Throwable {
-		for (String observation : geogObservations.getObservations()) {
-			output.outputField(observation == null ? "" : observation);
-		}
-		output.endRow();
-		geogObservations.clear();
-	}
-
-	@Override
-	public void formatObservation(Observation observation) throws Throwable {
-		BigDecimal value = observation.getValue();
-		String stringValue = null;
-		boolean spaceFlag = false;
-		if (value != null && StringUtils.isNotEmpty(observation.getStatus())) {
-			WdaTranslatedDataMarking translatedDataMarking = startDetails.getTranslatedDataMarkings().get(observation.getStatus().trim());
-			String translatedDataMarkingValue = translatedDataMarking != null ? translatedDataMarking.getValue() : "";
-			stringValue = value.toString() + (StringUtils.isNotEmpty(translatedDataMarkingValue) ? " (" + translatedDataMarkingValue + ")" : "");
-		} else if (value == null && StringUtils.isNotEmpty(observation.getStatus())) {
-			WdaTranslatedDataMarking translatedDataMarking = startDetails.getTranslatedDataMarkings().get(observation.getStatus().trim());
-			stringValue = translatedDataMarking != null ? translatedDataMarking.getValue() : "";
-		} else if (value != null) {
-			stringValue = value.toString();
-			spaceFlag = true;
-		} else {
-			// If value and status is null, set stringValue as ""
-			stringValue = "";
-		}
-		if (null != obsType) {
-			StringBuilder builder = new StringBuilder();
-			builder.append(stringValue);
-			if (spaceFlag) {
-				builder.append(" ");
-			}
-			builder.append("[");
-			builder.append(obsType.getObsType());
-			builder.append(null != observation.getObsTypeValue() ? observation.getObsTypeValue() : "");
-			builder.append("]");
-			stringValue = builder.toString();
-		}
-		Integer offset = offsetForDimItemSetId.get(observation.getDimItemSetId());
-		if (offset != null) {
-			geogObservations.addObservation(observation.getDimItemSetId(), stringValue, offset);
-		} else {
-			logger.warn("Offset not found for dimItemSetId " + observation.getDimItemSetId());
-		}
-	}
-
-	private void determineTitles(List<String> measureTypes, List<String> statisticalUnits, List<String> dimTitles, List<String> dimItemTitles) {
-		Map<String, Integer> uniqueDimItemTitles = new HashMap<String, Integer>();
-		int nextOffset = 0;
-		for (SegmentDetails segment : startDetails.getSegmentDetails()) {
-			for (DimItemSet dimItemSet : segment.getDimItemSets()) {
-				long dimItemSetId = dimItemSet.getDimItemSet().getDimItemSetId();
-				StringBuilder dimTitle = new StringBuilder();
-				StringBuilder dimItemTitle = new StringBuilder();
-				for (WdaDimensionItem wdaDimensionItem : dimItemSet.getDimensionItemList()) {
-					WdaDimension wdaDimension = wdaDimensionItem.getWdaDimension();
-					if (isGeogSig || !wdaDimension.getDimensionType().equals("Time")) {
-						WdaClassificationItem wdaClassificationItem = wdaDimensionItem.getWdaClassificationItem();
-						dimTitle.append((dimTitle.length() == 0 ? "" : "~") + language.choose(wdaDimension.getDimensionTitle(), wdaDimension.getWelshDimensionTitle()));
-						dimItemTitle.append((dimItemTitle.length() == 0 ? "" : "~") + (wdaClassificationItem.getIstotal() != null ? (language.choose("Total") + ": ") : "")
-								+ (language.choose(wdaDimensionItem.getLabel(), wdaDimensionItem.getWelshLabel())));
-					} else {
-						if (timeDimensionTitle == null) {
-							timeDimensionTitle = language.choose(wdaDimension.getDimensionTitle(), wdaDimension.getWelshDimensionTitle());
-						}
-					}
-				}
-				String key = dimItemTitle + "_" + segment.getSegmentId();
-				if (uniqueDimItemTitles.containsKey(key)) {
-					offsetForDimItemSetId.put(dimItemSetId, uniqueDimItemTitles.get(key));
-				} else {
-					measureTypes.add(segment.getMeasureType().getLabel(language));
-					statisticalUnits.add(segment.getStatisticalUnit().getLabel(language));
-					dimTitles.add(dimTitle.toString());
-					dimItemTitles.add(dimItemTitle.toString());
-					offsetForDimItemSetId.put(dimItemSetId, nextOffset);
-					uniqueDimItemTitles.put(key, nextOffset++);
-				}
-			}
-		}
-	}
-*/
 	public void flush() throws IOException {
 		output.flush();
 	}
