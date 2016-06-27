@@ -57,6 +57,8 @@ public class LoadToTarget implements Runnable {
 			ds.setLoadException("");
 			em.merge(ds);
 			StageToTarget(ds);
+	//		em.flush();
+	//		em.clear();
 			logger.info("loaded " + recct + " records");
 			ds.setStatus("2-Target-OK");
 			ds.setObscount(recct);
@@ -73,6 +75,8 @@ public class LoadToTarget implements Runnable {
 			logger.info(String.format("Loading to target not successful - " +  loadException.getMessage() ));
 		} finally {
 			em.merge(ds);
+			em.flush();
+			em.clear();
 		}
 
 	}
@@ -191,11 +195,15 @@ public class LoadToTarget implements Runnable {
 			}
 
 	//		no more than 30000 records allowed!
+		//	int noofchunks = 1;
+		//	int totalrecstoload = results.size();
 			int recstoload = 30000;
+			int chunksize = 1000; 
 			if (results.size() < recstoload){
 				recstoload = results.size();
 		    }
 			
+		
 			for (int i = 0; i < recstoload; i++){
 				StageDimensionalDataPoint sdp = (StageDimensionalDataPoint)results.get(i);
 		    //	1. Create a skeleton dimensional data point record in memory
@@ -355,6 +363,13 @@ public class LoadToTarget implements Runnable {
 			//	logger.info("VARI = " + dp.getVariable().getVariableId());
 				em.persist(dp);
 				recct = recct + 1;
+				
+				if (recct % chunksize == 0){
+					logger.info("saving chunk, record count = " +recct);
+					em.flush();
+					em.clear();
+				}
+				
 	//			Logger.info("Saving record number " + recct);
 			}
 		} catch (PersistenceException e) {

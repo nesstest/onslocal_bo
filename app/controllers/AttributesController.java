@@ -98,6 +98,8 @@ public class AttributesController extends Controller {
 	}
 	 finally {
 		em.merge(ds);
+		em.flush();
+		em.clear();
 	}
 		return ok(views.html.message.render(("Attributes updated"), Html.apply("<p>Column Concept: " + a1.getColumn_concept() + "<br/>Row Concept: " + a1.getRow_concept() + "</p>")));
 

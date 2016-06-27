@@ -30,6 +30,8 @@ GET     /editattribs                controllers.HomeController.editattribs
 
 GET     /log                        controllers.HomeController.log
 
+GET     /publish                    controllers.HomeController.publish
+
 GET    /status                      controllers.StatusController.getDatasets
 
 GET    /logs                        controllers.LogsController.showLog

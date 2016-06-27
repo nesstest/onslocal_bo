@@ -68,6 +68,8 @@ public class MetadataParser implements Runnable {
 			logger.info(String.format("Loading of metadata was not successful - ",  loadException ));
 		} finally {
 			em.merge(ds);
+			em.flush();
+			em.clear();
 		}
 	}
 	
