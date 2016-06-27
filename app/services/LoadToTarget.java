@@ -190,12 +190,13 @@ public class LoadToTarget implements Runnable {
 				}
 			}
 
-	//		no more than 1000 records allowed!
-			int recstoload = 1000;
+	//		no more than 30000 records allowed!
+			int recstoload = 30000;
 			if (results.size() < recstoload){
 				recstoload = results.size();
 		    }
-				for (int i = 0; i < recstoload; i++){
+			
+			for (int i = 0; i < recstoload; i++){
 				StageDimensionalDataPoint sdp = (StageDimensionalDataPoint)results.get(i);
 		    //	1. Create a skeleton dimensional data point record in memory
 				DimensionalDataPoint dp = new DimensionalDataPoint();
@@ -204,14 +205,24 @@ public class LoadToTarget implements Runnable {
 				
 		    //	2. Fetch the staged category records for current observation seq id
 				List<StageCategory> clist = sdp.getStageCategories();
+			
+				// sort list by dimension number
+				ArrayList<StageCategory> sclist = new ArrayList<StageCategory>();
+				for (int n = 0; n < clist.size(); n++){
+					for (int m = 0; m < clist.size(); m++){
+						if (clist.get(m).getId().getDimensionNumber() == n){
+							sclist.add(clist.get(m));
+						}
+					}
+				}
 		//		logger.info("clist = " + clist.size());	
 		    //	3. For each staged category record
 				ArrayList <Category> vcatList = new ArrayList<Category>();
-		    	for (int j = 0; j < clist.size(); j++){
+		    	for (int j = 0; j < sclist.size(); j++){
 	    	
 		    		
 		    //	3.1. Try to fetch the concept id, if not found create new concept
-		       		StageCategory scat = clist.get(j);
+		       		StageCategory scat = sclist.get(j);
 		    //		logger.info("catno = " + scat.getId().getDimensionNumber());
 		    		String conceptName = scat.getConceptSystemLabelEng();
 	    	//	3.2. Try to fetch the category id, if not found create new category

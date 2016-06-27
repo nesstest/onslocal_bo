@@ -13,6 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.create;
 import views.html.log;
+import views.html.publish;
 
 
 
@@ -46,6 +47,10 @@ public class HomeController extends Controller {
         return ok(log.render("log"));
     }    
 
+    public Result publish() {
+        return ok(publish.render("na"));
+    }   
+    
     public Result metadata() {
     	Form<Metadata> metaForm = formFactory.form(Metadata.class);
     	Metadata m1 = new Metadata();
