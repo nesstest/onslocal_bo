@@ -7,12 +7,13 @@ import models.Editor;
 import models.Generate;
 import models.Metadata;
 import models.EditAttribs;
+
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.publish;
 
+import views.html.publish;
 
 
 /**
@@ -34,8 +35,7 @@ public class HomeController extends Controller {
     public Result load() {
     	Form<Dataset> dsForm = formFactory.form(Dataset.class);
         return ok(views.html.load.render(dsForm));
-   // 	return ok(load.render("Choose a dataset to load."));
-    }
+     }
     
     public Result publish() {
         return ok(publish.render("na"));
@@ -44,20 +44,16 @@ public class HomeController extends Controller {
     public Result metadata() {
     	Form<Metadata> metaForm = formFactory.form(Metadata.class);
     	Metadata m1 = new Metadata();
-   // 	m1.setDsname("TEST1");
     	m1.setDimdsid(11L);
         return ok(views.html.metadata.render(metaForm.fill(m1)));
-   // 	return ok(load.render("Choose a dataset to load."));
     }
     
     public Result edit() {
     	Form<Editor> editForm = formFactory.form(Editor.class);
     	Editor ed1 = new Editor();
     	ed1.setTask("T");
-  //  	ed1.setDsname("TEST1");
     	ed1.setDimdsid(11L); 
         return ok(views.html.edit.render(editForm.fill(ed1)));
-   // 	return ok(load.render("Choose a dataset to load."));
     } 
     
     public Result generate() {
