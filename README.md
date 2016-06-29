@@ -24,8 +24,7 @@ The code is stored in GitHub and the application is deployed to AWS
 (currently a manual process). The access rules in AWS only allow access
 from the ONS Network or WiFi in Newport or Titchfield.
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image1.png "Screen shot"){width="6.260416666666667in"
-height="4.927083333333333in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image1.png "Screen shot")
 
 **Step 1 - Load To Staging**
 
@@ -33,7 +32,7 @@ The back office database is the same as the front office with the
 exception of a staging area for datasets. Whilst in theory it is
 possible to populate the actual tables used by the front end in a single
 pass from the input CSV file, it is much more practical to initially
-load the data into tables that match the input file’s structure. All the
+load the data into tables that match the input fileâ€™s structure. All the
 data is then easily accessible via SQL in the next step (load to
 target).
 
@@ -41,14 +40,14 @@ The input file must be in the current WDA input format as produced by
 DataBaker (see Appendix A). In future we would expect this format to be
 simplified and tidied up (the WDA one has a lot of baggage).
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image2.png "Screen shot"){width="6.260416666666667in" height="3.6875in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image2.png "Screen shot")
 
 The Dataset ID is up to 10 digits alphanumeric (no spaces or special
 characters allowed). This is the Data Resource ID (equivalent to dataset
 family in NeSS) on the database which allows there to be one or many
 DimensionalDataSet (dataset instance) entries associated with it. In the
 Alpha you can only have one-to-one so we simply refer to the 10 digit
-code as “Dataset Id” throughout the system.
+code as 'Dataset Id' throughout the system.
 
 The Dataset Title should be a meaningful short description.
 
@@ -65,11 +64,11 @@ viewable on the status screen and logs.
 This is a complex process that transforms the staging data to real
 records. It has to populate a number of tables:
 
-Geographic Areas – as the input file has only the external code we’ve
+Geographic Areas - as the input file has only the external code we've
 preloaded a selection of areas from the FO database, so the system does
 not attempt to create new ones (error if area not present).
 
-Time Periods – in this case we have not precreated any so we don’t know
+Time Periods - in this case we have not precreated any so we don't know
 if the incoming ones will be new or already existing, so have to cope
 with both.
 
@@ -77,12 +76,12 @@ Note that there is a check made for there being only one area or only
 one time at the start. Geography and Time values are used to populate
 the Population table.
 
-Categories – each staging observation record has 1 or more categories
+Categories - each staging observation record has 1 or more categories
 associated with it (depending on the number of topic dimensions). Again
 the system has to create new ones if necessary. It does this blindly so
 you can end up with slightly different versions of the same thing.
 
-Variables – each combination of categories must be checked and a new
+Variables - each combination of categories must be checked and a new
 variable entry created if necessary.
 
 Finally, armed with all the above for a single record, the observation
@@ -92,13 +91,13 @@ This is not an efficient way to load the data and performance is not
 good. To make this run fast enough for large datasets a lot of work is
 required.
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image3.png "Screen shot"){width="6.260416666666667in" height="2.25in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image3.png "Screen shot")
 
 The only input is the dataset id (which you have to remember or get from
 the Status screen).
 
 Errors are reported to the logs and usually also the status screen (some
-database errors which result in a rollback are not captured – on snag
+database errors which result in a rollback are not captured â€“ on snag
 list).
 
 **Step 3 - Edit Attributes**
@@ -114,15 +113,14 @@ multipliers which are usually not specified on the WDA input files, so
 need to be set by the BO user. The Alpha takes whatever is given in the
 input file, and if this is blank you get Persons and Count by default.
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image4.png "Screen shot"){width="6.260416666666667in"
-height="2.9791666666666665in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/tree/master/public/images/image4.png "Screen shot")
 
-Currently all the “concepts” (high level classifications such as age and
+Currently all the 'concepts' (high level classifications such as age and
 sex) in the system are offered plus Geographic Area and Time Period.
 Should really filter the concepts to those used on the current dataset
 (on the snag list).
 
-**Step 4 – Load Metadata**
+**Step 4 - Load Metadata**
 
 The database holds metadata fields for a dataset that match the DCAT
 specification (see <http://guidance.data.gov.uk/harvesting.html#dcat>).
@@ -131,8 +129,7 @@ MetaMaker. There are a number of ways this data could be transferred and
 ingested (such as an exposed service). For simplicity in the Alpha we
 are using copy and paste into a text box.
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image5.png "Screen shot"){width="6.270833333333333in"
-height="4.333333333333333in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image5.png "Screen shot")
 
 The user has to enter the dataset ID then paste the metadata into the
 box and click the import button. The input is then validated and saved
@@ -143,10 +140,10 @@ screen could also allow you to change one or more of the individual
 fields and regenerate the JSON (held in a CLOB on the database) as well
 as updating the individual fields from the JSON as it does now.
 
-Note that the “modified” date gets automatically changed to now at the
+Note that the 'modified' date gets automatically changed to now at the
 end as the system does this after every step.
 
-**Step 5 – Generate CSV**
+**Step 5 - Generate CSV**
 
 The next step is to generate a CSV file from the database for the entire
 dataset.
@@ -167,28 +164,26 @@ categories).
 Time Periods are sorted alphabetically rather than chronologically (snag
 list item to fix this).
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image6.png "Screen shot"){width="6.260416666666667in" height="5.0in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image6.png "Screen shot")
 
 For simplicity, the generated CSV is held in the logfile area on the
 server and streamed straight to the user who can either open it (e.g. in
 Excel) or save to a local file.
 
-**Step 6 – Publish Dataset**
+**Step 6 - Publish Dataset**
 
 Publishing is out of scope for the Alpha but we hope to fake it but
 pointing the FO API to the BO database, and check that the datasets
 work.
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image7.png "Screen shot"){width="6.270833333333333in"
-height="4.927083333333333in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image7.png "Screen shot")
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image8.png "Screen shot"){width="6.260416666666667in"
-height="2.6458333333333335in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image8.png "Screen shot")
 
-**Utility – Status Screen**
+**Utility - Status Screen**
 
 All the datasets in the system are listed here. Dataset ID and Last
-Updated are self-explanatory…
+Updated are self-explanatoryâ€¦
 
 *List of Statuses*
 
@@ -215,25 +210,24 @@ is the actual number loaded which may not be all the staging records
 Can be validation errors (system finds a problem with the data) or load
 errors (unexpected runtime failures)
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image9.png "Screen shot"){width="6.260416666666667in"
-height="2.6145833333333335in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image9.png "Screen shot")
 
 There is currently no user functionality such as sorting or filtering.
 This is OK for the Alpha but would be essential in a later version.
 
-**Utility – View Log**
+**Utility - View Log**
 
 A useful facility to be able to browse the application logs, both for
 informational messages when things have worked and error messages when
 failures occur.
 
-![alt text](https://github.com/nesstest/onslocal_bo/tree/master/public/images/image10.png "Screen shot"){width="6.260416666666667in" height="4.71875in"}
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image10.png "Screen shot")
 
 Currently, the log grows continuously until the application is restarted
-or redeployed, there is no option to show (say) only today’s logs or a
+or redeployed, there is no option to show (say) only today's logs or a
 particular level of logging (e.g. errors only, info only).
 
-**Appendix A – WDA Input Format**
+**Appendix A - WDA Input Format**
 
 A Column 0 Observation value (number) --observation
 
