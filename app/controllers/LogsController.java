@@ -26,10 +26,10 @@ public class LogsController extends Controller {
 	@Inject 
 	FormFactory formFactory;
 	
-	@Inject
-	JPAApi jpaApi;
+//	@Inject
+//	JPAApi jpaApi;
     
-    @Transactional
+ //   @Transactional
     public Result showLog(){
     	Form<Logs> logForm = formFactory.form(Logs.class);
     	Logs l1 = new Logs();
