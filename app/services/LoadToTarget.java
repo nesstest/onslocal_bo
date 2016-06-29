@@ -2,27 +2,18 @@ package services;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
-import org.json.*;
 import play.*;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.persistence.exceptions.DatabaseException;
 
-import utils.GeogHelper;
-import utils.Utility;
 import exceptions.CSVValidationException;
 import exceptions.GLLoadException;
 import models.*;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.inject.*;
-import play.db.jpa.JPAApi;
-import play.db.jpa.Transactional;
 
 // see http://guidance.data.gov.uk/dcat_fields.html
 public class LoadToTarget implements Runnable {
@@ -262,20 +253,12 @@ public class LoadToTarget implements Runnable {
 		    	StringBuilder variableText = new StringBuilder("");
 		    	for (int k = 0; k < vcatList.size(); k++){
 		    	variableText.append(vcatList.get(k).getName());
-		    	//	variableName = variableName + categoryName;
-		    		if (k < vcatList.size()-1){
+	    		if (k < vcatList.size()-1){
 		    			variableText.append(" | ");
-		    		//	variableName = variableName + " | ";
 		    		}
 		    	}
 		    	variableName = variableText.toString();
-		   // 	for (int l=1; l < 5000; l++){
-		    //		variableName = variableText.toString();
-		    //		if (variableName.length() > 0){
-		    //			logger.info("breaking #" + l);
-		    //			break;
-		    //		}
-		   // 	}
+
 		//		logger.info("variableName = " + variableName);
 				List varList =  em.createQuery("SELECT v FROM Variable v WHERE v.name = :vname",Variable.class).setParameter("vname", variableName).getResultList();
 				Variable var = null;

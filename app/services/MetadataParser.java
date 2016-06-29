@@ -3,8 +3,6 @@ import javax.persistence.EntityManager;
 import org.json.*;
 import play.*;
 
-import org.apache.commons.lang.StringUtils;
-import utils.Utility;
 import exceptions.CSVValidationException;
 import exceptions.GLLoadException;
 import models.*;
@@ -12,10 +10,6 @@ import models.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-import javax.inject.*;
-import play.db.jpa.JPAApi;
-import play.db.jpa.Transactional;
 
 // see http://guidance.data.gov.uk/dcat_fields.html
 public class MetadataParser implements Runnable {

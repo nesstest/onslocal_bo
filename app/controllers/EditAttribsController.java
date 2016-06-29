@@ -1,21 +1,12 @@
 package controllers;
 
-import play.*;
 import play.data.Form;
 import play.mvc.*;
-import play.twirl.api.Html;
-import views.html.*;
 import models.*;
 import play.data.FormFactory;
-import play.data.validation.ValidationError;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.*;
-import javax.persistence.EntityManager;
 
-import services.LoadToTarget;
 import play.db.jpa.JPAApi;
 import play.db.jpa.Transactional;
 /**
@@ -29,7 +20,6 @@ public class EditAttribsController extends Controller {
 	
 	@Inject
 	JPAApi jpaApi;
-	
     
     @Transactional
     public Result processform() {
@@ -42,8 +32,7 @@ public class EditAttribsController extends Controller {
     	EditAttribs edat = editAttribsForm.get();
     
     	dsid = edat.getDsid();
-    	
-
+   
        /* return ok(views.html.attribs.render(prepareAtts(dsid))); */
         return redirect(routes.AttributesController.prepareAtts(dsid));
    	 }		

@@ -7,27 +7,18 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
 import javax.persistence.EntityManager;
-import javax.persistence.SqlResultSetMapping;
 
 import play.*;
 
-import org.apache.commons.lang.StringUtils;
-import utils.Utility;
 import exceptions.CSVValidationException;
 import exceptions.GLLoadException;
 import models.*;
-import javax.inject.*;
-import play.db.jpa.JPAApi;
-import play.db.jpa.Transactional;
 
 /**
  * The Class CSVGenerator.

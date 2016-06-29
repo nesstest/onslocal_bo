@@ -1,14 +1,9 @@
 package controllers;
 
-import play.*;
 import play.data.Form;
 import play.mvc.*;
-import views.html.*;
 import models.*;
 import play.data.FormFactory;
-import play.data.validation.ValidationError;
-
-import java.util.ArrayList;
 import java.io.File;
 
 import javax.inject.*;
@@ -55,8 +50,6 @@ public class LoadController extends Controller {
        //   filename = filename.getFilename();
           status   = form.getStatus();
           String fileName = filename.getFilename();
-    	 // String fullPath = "C:\\Users\\Admin\\Documents\\ILCH\\" + filename;
-       //	  String fullPath = "C:\\ILCH\\" + filename;
           java.io.File file = filename.getFile();
        	  InputCSVParser inputCSV = new InputCSVParser(form,file);
    		  EntityManager em = jpaApi.em();  
@@ -71,8 +64,6 @@ public class LoadController extends Controller {
        	  inputCSV.runJPA(em, dds);
        	  em.flush();
        	  em.clear();
-       	  
-         //return ok(id + " " + title + " " + filename + " " + form.getStatus());
          
          return ok(views.html.message.render((id + " " + form.getStatus()), Html.apply("<p>Dataset id: " + id + "<br/>Dataset title: " + title + "<br/>Filename: " + fileName + "<br/>Status: " + form.getStatus() + "</p>")));
       }

@@ -11,8 +11,6 @@ import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.create;
-import views.html.log;
 import views.html.publish;
 
 
@@ -33,20 +31,12 @@ public class HomeController extends Controller {
 	@Inject 
 	FormFactory formFactory;
     
-    public Result create() {
-        return ok(create.render("create a dataset"));
-   }
-
     public Result load() {
     	Form<Dataset> dsForm = formFactory.form(Dataset.class);
         return ok(views.html.load.render(dsForm));
    // 	return ok(load.render("Choose a dataset to load."));
     }
     
-    public Result log() {
-        return ok(log.render("log"));
-    }    
-
     public Result publish() {
         return ok(publish.render("na"));
     }   
