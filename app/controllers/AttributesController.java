@@ -86,15 +86,15 @@ public class AttributesController extends Controller {
     		drs.setRowConcept(a1.getRow_concept());
     		drs.setColumnConcept(a1.getColumn_concept());
     		em.merge(drs);
-    		TimeHelper thelp = new TimeHelper();
-    		List <TimePeriod> times = em.createQuery("SELECT t FROM TimePeriod t",TimePeriod.class).getResultList();
-        	for (int i=0; i< times.size(); i++){
-        			TimePeriod tt = times.get(i);
-        			String timeString = tt.getName();
-        			tt.setStartDate(thelp.getStartDate(timeString));
-        			tt.setEndDate(thelp.getEndDate(timeString));
-        			em.merge(tt);
-        	    	}
+    	//	TimeHelper thelp = new TimeHelper();
+    	//	List <TimePeriod> times = em.createQuery("SELECT t FROM TimePeriod t",TimePeriod.class).getResultList();
+        //	for (int i=0; i< times.size(); i++){
+        //			TimePeriod tt = times.get(i);
+        //			String timeString = tt.getName();
+        //			tt.setStartDate(thelp.getStartDate(timeString));
+        //			tt.setEndDate(thelp.getEndDate(timeString));
+        //			em.merge(tt);
+        //	    	}
     	}
 	    catch (Exception e) {
 	    	e.printStackTrace();
