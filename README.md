@@ -32,12 +32,12 @@ The back office database is the same as the front office with the
 exception of a staging area for datasets. Whilst in theory it is
 possible to populate the actual tables used by the front end in a single
 pass from the input CSV file, it is much more practical to initially
-load the data into tables that match the input fileâ€™s structure. All the
+load the data into tables that match the input file's structure. All the
 data is then easily accessible via SQL in the next step (load to
 target).
 
 The input file must be in the current WDA input format as produced by
-DataBaker (see Appendix A). In future we would expect this format to be
+DataBaker. In future we would expect this format to be
 simplified and tidied up (the WDA one has a lot of baggage).
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image2.png "Screen shot")
@@ -97,8 +97,7 @@ The only input is the dataset id (which you have to remember or get from
 the Status screen).
 
 Errors are reported to the logs and usually also the status screen (some
-database errors which result in a rollback are not captured â€“ on snag
-list).
+database errors which result in a rollback are not captured - to be fixed).
 
 **Step 3 - Edit Attributes**
 
@@ -113,12 +112,12 @@ multipliers which are usually not specified on the WDA input files, so
 need to be set by the BO user. The Alpha takes whatever is given in the
 input file, and if this is blank you get Persons and Count by default.
 
-![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/tree/master/public/images/image4.png "Screen shot")
+![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image4.png "Screen shot")
 
 Currently all the 'concepts' (high level classifications such as age and
 sex) in the system are offered plus Geographic Area and Time Period.
 Should really filter the concepts to those used on the current dataset
-(on the snag list).
+(to be fixed).
 
 **Step 4 - Load Metadata**
 
@@ -152,7 +151,7 @@ This, plus a metadata JSON file, forms the download data package
 uploaded to the cloud as part of the publish process.
 
 In the Alpha it is the main way of checking the data has loaded
-correctly (the screen shot below looks suspicious to me!)
+correctly.
 
 The logic used is currently the simplest possible but could be a lot
 more sophisticated:
@@ -161,8 +160,8 @@ The rows are area by time (times nested within areas) so this works for
 all types of data. The column is the variable (not broken up into nested
 categories).
 
-Time Periods are sorted alphabetically rather than chronologically (snag
-list item to fix this).
+Time Periods are sorted alphabetically rather than chronologically (intending to
+fix this).
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image6.png "Screen shot")
 
@@ -183,7 +182,7 @@ work.
 **Utility - Status Screen**
 
 All the datasets in the system are listed here. Dataset ID and Last
-Updated are self-explanatoryâ€¦
+Updated are self-explanatory.
 
 *List of Statuses*
 
@@ -227,95 +226,4 @@ Currently, the log grows continuously until the application is restarted
 or redeployed, there is no option to show (say) only today's logs or a
 particular level of logging (e.g. errors only, info only).
 
-**Appendix A - WDA Input Format**
 
-A Column 0 Observation value (number) --observation
-
-B Column 1 Data marking String --observation
-
-C Column 2 Statistical Unit Eng value --attribute
-
-D Column 3 Statistical Unit welsh value --attribute
-
-E Column 4 Meas type eng --attribute
-
-F Column 5 Meas type welsh --attribute
-
-G Column 6--&gt;obs type code --observation
-
-H Column 7--&gt;empty --ignore
-
-I Column 8--&gt;obs type val --observation
-
-J Column 9--&gt;unit mult scalar(english value) --attribute
-
-K Column 10--&gt;unit of meas eng --attribute
-
-L Column 11--&gt;unit of meas welsh --attribute
-
-M Column 12--&gt;confidentiality --observation
-
-N Column 13--&gt;empty --ignore
-
-O Column 14--&gt;geog --geog\_item
-
-P Column 15--&gt;empt --ignore
-
-Q Column 16--&gt;empt --ignore
-
-R Column 17--&gt;Time Dim Item ID --dimension item (CL\_TIME)
-
-S Column 18--&gt;Time Dim Item Label Eng --dimension item
-
-T Column 19--&gt;Time Dim Item Label Welsh --dimension item
-
-U Column 20--&gt;time type --classification item type (Year, Month,
-Quarter)
-
-V Column 21--&gt;emp --ignore
-
-W Column 22--&gt;Statistical Population ID -- segment
-
-X Column 23--&gt;Statistical Population Label Eng -- segment
-
-Y Column 24--&gt;Statistical Population Label welsh -- segment
-
-Z Column 25--&gt;CDID --dim\_item\_set
-
-AA Column 26--&gt;CDID Description --dim\_item\_set
-
-AB Column 27--&gt;empt --ignore
-
-AC Column 28--&gt;empt --ignore
-
-AD Column 29--&gt;empt --ignore
-
-AE Column 30--&gt;empt --ignore
-
-AF Column 31--&gt;empt --ignore
-
-AG Column 32--&gt;empt --ignore
-
-AH Column 33--&gt;empt --ignore
-
-AI Column 34--&gt;empt --ignore
-
-AJ Column 35--&gt;Dim ID 1
-
-AK Column 36--&gt;Dimension Label Eng 1
-
-AL Column 37--&gt;Dimension Label Welsh 1
-
-AM Column 38--&gt;Dim Item ID 1
-
-AN Column 39--&gt;Dimension Item Label Eng 1
-
-AO Column 40--&gt;Dimension Item Label Cym 1
-
-AP Column 41--&gt;Is Total 1
-
-AQ Column 42--&gt;Is Subtotal 1
-
-// 35-42 cols will be repeated if there are more dimensions
-
-Written by: Richard Smith
