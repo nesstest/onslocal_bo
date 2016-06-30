@@ -44,7 +44,7 @@ public class CSVGenerator implements Runnable {
 			 " v.unit_type, v.name AS variable_name, d.value" +
 			 " FROM onslocal_data_bo.geographic_area ga, onslocal_data_bo.time_period ti, onslocal_data_bo.dimensional_data_point d, onslocal_data_bo.variable v" +
 			 " WHERE ga.geographic_area_id = d.geographic_area_id and d.variable_id = v.variable_id and d.time_period_id = ti.time_period_id" +
-			 " AND d.dimensional_data_set_id = ?1 ORDER BY ga.geographic_area_id, time_name, variable_name";
+			 " AND d.dimensional_data_set_id = ?1 ORDER BY ga.geographic_area_id, ti.start_date, variable_name";
 	/**
 	 * Instantiates a new cSV dataset formatter.
 	 * 

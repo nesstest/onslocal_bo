@@ -3,6 +3,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
 import play.*;
+import utils.TimeHelper;
 
 import org.eclipse.persistence.exceptions.DatabaseException;
 
@@ -156,6 +157,7 @@ public class LoadToTarget implements Runnable {
 					singlegeo = (GeographicArea)singleAreaList.get(0);
 				}
 			}
+			TimeHelper thelp = new TimeHelper();
 			TimePeriod singleTim = null;
 			if (singletime){
 				String timeCode = (String)times.get(0);
@@ -165,9 +167,8 @@ public class LoadToTarget implements Runnable {
 					StageDimensionalDataPoint tsp = (StageDimensionalDataPoint)results.get(0);
 					singleTim = new TimePeriod();
 					singleTim.setName(timeCode);
-					Date startDate = new Date();
-					singleTim.setStartDate(startDate);
-					singleTim.setEndDate(startDate);
+        			singleTim.setStartDate(thelp.getStartDate(timeCode));
+        			singleTim.setEndDate(thelp.getEndDate(timeCode));
 					singleTim.setTimeTypeBean(tty);
 					if (tsp.getTimeType().equalsIgnoreCase("QUARTER"))
 					{
@@ -302,9 +303,8 @@ public class LoadToTarget implements Runnable {
 					if (timeList.isEmpty()){
 						tim = new TimePeriod();
 						tim.setName(timeCode);
-						Date startDate = new Date();
-						tim.setStartDate(startDate);
-						tim.setEndDate(startDate);
+	        			tim.setStartDate(thelp.getStartDate(timeCode));
+	        			tim.setEndDate(thelp.getEndDate(timeCode));
 						tim.setTimeTypeBean(tty);
 						if (sdp.getTimeType().equalsIgnoreCase("QUARTER"))
 						{
