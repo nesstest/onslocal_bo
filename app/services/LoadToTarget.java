@@ -270,6 +270,7 @@ public class LoadToTarget implements Runnable {
 		    	 var.setName(variableName);
 		    	 var.setUnitTypeBean(ut);
 		    	 var.setValueDomainBean(vd);
+		    	 var.setCategories(vcatList);
 			     em.persist(var);
 	    		}
 	    		else

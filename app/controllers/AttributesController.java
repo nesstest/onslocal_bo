@@ -48,20 +48,28 @@ public class AttributesController extends Controller {
    // 	Logger.info("size2 = " + dimds.size());
     	datasetdefid = dimds.get(0).getDimensionalDataSetId();
     	ArrayList<String> conList = new ArrayList<String>();
-    	List <ConceptSystem> cons = em.createQuery("SELECT c FROM ConceptSystem c",ConceptSystem.class).getResultList();
+  //  	List <ConceptSystem> cons = em.createQuery("SELECT c FROM ConceptSystem c",ConceptSystem.class).getResultList();
     
     //  Join not working - incomplete load?	
-    //	List <Category> cons = em.createQuery("SELECT c FROM Category c WHERE EXISTS "
-    //			+ "(SELECT dds.dimensionalDataSetId FROM DimensionalDataSet dds JOIN dds.dimensionalDataPoints ddp "
-    //			+ "JOIN ddp.variable v JOIN v.categories cat WHERE ddp.variable.variableId = v.variableId "
-    //			+ "AND cat.categoryId = c.categoryId "
-    //			+ "AND dds.dataResourceBean=:dsid)",Category.class).setParameter("dsid", drs).getResultList();
+    	List <Category> cons = em.createQuery("SELECT c FROM Category c WHERE EXISTS "
+    			+ "(SELECT dds.dimensionalDataSetId FROM DimensionalDataSet dds JOIN dds.dimensionalDataPoints ddp "
+    			+ "JOIN ddp.variable v JOIN v.categories cat WHERE ddp.variable.variableId = v.variableId "
+    			+ "AND cat.categoryId = c.categoryId "
+    			+ "AND dds.dataResourceBean=:dsid)",Category.class).setParameter("dsid", drs).getResultList();
 
-    	conList.add("Area");
-    	conList.add("Time");
+    	conList.add("Geographic Area");
+    	conList.add("Time Period");
+   // 	conList.add("Variable");
+    	
+    	Logger.info("cons = " + cons.size());
     	for (int i=0; i< cons.size(); i++){
+    		String testString = cons.get(i).getConceptSystemBean().getConceptSystem();
+    		if (!conList.contains(testString)){
+    			conList.add(testString);
+    		}
+    		
     //		conList.add(cons.get(i).getConceptSystemBean().getConceptSystem());
-    		conList.add(cons.get(i).getConceptSystem());
+    //		conList.add(cons.get(i).getConceptSystem());
     	}
     	a1.setConceptList(conList);
     	return ok(views.html.attribs.render(attForm.fill(a1),conList)); 
