@@ -1,8 +1,15 @@
 package controllers;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+
+import models.DataResource;
 import models.Dataset;
+import models.DimensionalDataSet;
 import models.Editor;
 import models.Generate;
 import models.Metadata;
@@ -10,6 +17,8 @@ import models.EditAttribs;
 
 import play.data.Form;
 import play.data.FormFactory;
+import play.db.jpa.JPAApi;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -32,6 +41,9 @@ public class HomeController extends Controller {
 	@Inject 
 	FormFactory formFactory;
     
+	@Inject
+	JPAApi jpaApi;
+	
     public Result load() {
     	Form<Dataset> dsForm = formFactory.form(Dataset.class);
         return ok(views.html.load.render(dsForm));
@@ -41,30 +53,74 @@ public class HomeController extends Controller {
         return ok(publish.render("na"));
     }   
     
+    @Transactional
     public Result metadata() {
     	Form<Metadata> metaForm = formFactory.form(Metadata.class);
     	Metadata m1 = new Metadata();
     	m1.setDimdsid(11L);
-        return ok(views.html.metadata.render(metaForm.fill(m1)));
+		EntityManager em = jpaApi.em();
+    	List <DimensionalDataSet> dis = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.status IN ('2-Target-OK','3-Attributes-OK','4-Metadata-OK','4-Metadata-Failed','5-Generate-OK')" ,DimensionalDataSet.class).getResultList();
+    	ArrayList<String> datasetList = new ArrayList<String>();
+    	for (int i=0; i<dis.size(); i++)
+    	{
+    		datasetList.add(dis.get(i).getDataResourceBean().getDataResource());
+    	}
+    	Collections.sort(datasetList);
+    	em.flush();
+    	em.clear();
+        return ok(views.html.metadata.render(metaForm.fill(m1),datasetList));
     }
     
+	@Transactional
     public Result edit() {
+		EntityManager em = jpaApi.em();
     	Form<Editor> editForm = formFactory.form(Editor.class);
     	Editor ed1 = new Editor();
     	ed1.setTask("T");
     	ed1.setDimdsid(11L); 
-        return ok(views.html.edit.render(editForm.fill(ed1)));
+    	List <DimensionalDataSet> dis = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.status = '1-Staging-OK'" ,DimensionalDataSet.class).getResultList();
+    	ArrayList<String> datasetList = new ArrayList<String>();
+    	for (int i=0; i<dis.size(); i++)
+    	{
+    		datasetList.add(dis.get(i).getDataResourceBean().getDataResource());
+    	}
+    	Collections.sort(datasetList);
+    	em.flush();
+    	em.clear();
+        return ok(views.html.edit.render(editForm.fill(ed1),datasetList));
     } 
     
+	@Transactional
     public Result generate() {
     	Form<Generate> genForm = formFactory.form(Generate.class);
     	Generate gen = new Generate();
-        return ok(views.html.generate.render(genForm.fill(gen)));
+		EntityManager em = jpaApi.em();
+    	List <DimensionalDataSet> dis = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.status IN ('2-Target-OK','3-Attributes-OK','4-Metadata-OK','5-Generate-Failed','5-Generate-OK')" ,DimensionalDataSet.class).getResultList();
+    	ArrayList<String> datasetList = new ArrayList<String>();
+    	for (int i=0; i<dis.size(); i++)
+    	{
+    		datasetList.add(dis.get(i).getDataResourceBean().getDataResource());
+    	}
+    	Collections.sort(datasetList);
+    	em.flush();
+    	em.clear();
+        return ok(views.html.generate.render(genForm.fill(gen),datasetList));
     }
-    
+	
+	@Transactional
     public Result editattribs() {
      	Form<EditAttribs> editAttribsForm = formFactory.form(EditAttribs.class);
-         return ok(views.html.editattribs.render(editAttribsForm));
+		EntityManager em = jpaApi.em();
+    	List <DimensionalDataSet> dis = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.status IN ('2-Target-OK','3-Attributes-OK','4-Metadata-OK','3-Attributes-Failed','5-Generate-OK')" ,DimensionalDataSet.class).getResultList();
+    	ArrayList<String> datasetList = new ArrayList<String>();
+    	for (int i=0; i<dis.size(); i++)
+    	{
+    		datasetList.add(dis.get(i).getDataResourceBean().getDataResource());
+    	}
+    	Collections.sort(datasetList);
+    	em.flush();
+    	em.clear();
+        return ok(views.html.editattribs.render(editAttribsForm,datasetList));
      }  
     
     public Result index() {

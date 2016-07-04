@@ -2,7 +2,7 @@
  * This template takes a single argument, a String containing a
  * message to display.(message:String)
  *@
-@(editForm:Form[Editor])
+@(editForm:Form[Editor],datasetList: List[String])
 
 @import helper._
 
@@ -22,10 +22,12 @@
 	<div> 
 	   @helper.form(action=routes.EditController.processform()) {  
 	   
-	   @helper.input(editForm("dsname"), '_label -> "Enter Dataset ID", '_class -> "form-field-pair") { (id, name, value, args) =>
-	    <input class="inputs" type="text" value="" size="10" autocomplete="off" name="dsname" id="dsname" placeholder="Dataset ID" @toHtmlArgs(args)>
-	   }
-	   
+	   	@select(
+  field = editForm("dsname"),
+  options = options(datasetList),
+  '_label -> "Select Dataset", '_class -> "form-field-pair", 'class -> "inputs"
+	)
+
        <input type="hidden" value="T" size="10" name="task" id="task">
 
 	   <div class="load"> 

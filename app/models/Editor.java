@@ -10,7 +10,8 @@ public class Editor {
 	  private String dsname;
 	  private Long dimdsid;
 	  private String task;
-	    private String status;
+	  private String status;
+	  private List<String> dsList; 
 	  
 	public String getDsname() {
 		return dsname;
@@ -38,7 +39,13 @@ public class Editor {
 		this.status = status;
 	}
 
-   public List<ValidationError> validate() {
+   public List<String> getDsList() {
+		return dsList;
+	}
+	public void setDsList(List<String> dsList) {
+		this.dsList = dsList;
+	}
+public List<ValidationError> validate() {
 
       List<ValidationError> errors = new ArrayList<ValidationError>();
       
