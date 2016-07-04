@@ -7,6 +7,8 @@ import play.twirl.api.Html;
 import models.*;
 import play.data.FormFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.*;
@@ -34,7 +36,17 @@ public class EditController extends Controller {
     	Form<Editor> editForm = formFactory.form(Editor.class).bindFromRequest();
     	
    	if(editForm.hasErrors()) {
-   	   return badRequest(views.html.edit.render(editForm));
+		EntityManager em = jpaApi.em();
+    	List <DimensionalDataSet> dis = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.status = '1-Staging-OK'" ,DimensionalDataSet.class).getResultList();
+    	ArrayList<String> datasetList = new ArrayList<String>();
+    	for (int i=0; i<dis.size(); i++)
+    	{
+    		datasetList.add(dis.get(i).getDataResourceBean().getDataResource());
+    	}
+    	Collections.sort(datasetList);
+    	em.flush();
+    	em.clear();
+   	   return badRequest(views.html.edit.render(editForm,datasetList));
    	} else {
     	
     	Editor ed1 = editForm.get();

@@ -11,6 +11,7 @@ import play.data.validation.ValidationError;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.*;
@@ -38,7 +39,17 @@ public class GenerateController extends Controller {
     	Form<Generate> genForm = formFactory.form(Generate.class).bindFromRequest();
     	
    	if(genForm.hasErrors()) {
-   	   return badRequest(views.html.generate.render(genForm));
+		EntityManager em = jpaApi.em();
+    	List <DimensionalDataSet> dis = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.status IN ('2-Target-OK','3-Attributes-OK','4-Metadata-OK','5-Generate-Failed','5-Generate-OK')" ,DimensionalDataSet.class).getResultList();
+    	ArrayList<String> datasetList = new ArrayList<String>();
+    	for (int i=0; i<dis.size(); i++)
+    	{
+    		datasetList.add(dis.get(i).getDataResourceBean().getDataResource());
+    	}
+    	Collections.sort(datasetList);
+    	em.flush();
+    	em.clear();
+   	   return badRequest(views.html.generate.render(genForm,datasetList));
    	} else {
     	
     	Generate g1 = genForm.get();

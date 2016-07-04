@@ -22,8 +22,6 @@ import play.db.jpa.Transactional;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import views.html.publish;
-
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -50,7 +48,7 @@ public class HomeController extends Controller {
      }
     
     public Result publish() {
-        return ok(publish.render("na"));
+        return ok(views.html.publish.render("na"));
     }   
     
     @Transactional
