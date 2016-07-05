@@ -93,8 +93,7 @@ required.
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image3.png "Screen shot")
 
-The only input is the dataset id (which you have to remember or get from
-the Status screen).
+The only input is the dataset id which you choose from a dropdown list of those with the status 1-Staging-OK.
 
 Errors are reported to the logs and usually also the status screen (some
 database errors which result in a rollback are not captured - to be fixed).
@@ -114,10 +113,8 @@ input file, and if this is blank you get Persons and Count by default.
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image4.png "Screen shot")
 
-Currently all the 'concepts' (high level classifications such as age and
-sex) in the system are offered plus Geographic Area and Time Period.
-Should really filter the concepts to those used on the current dataset
-(to be fixed).
+The user is presented with the options "Geographic Area", "Time Period" and all 
+the concepts (equivalent to topic dimensions) used on the current dataset.
 
 **Step 4 - Load Metadata**
 
@@ -130,7 +127,8 @@ are using copy and paste into a text box.
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image5.png "Screen shot")
 
-The user has to enter the dataset ID then paste the metadata into the
+The user has to select the dataset ID from a list of those with the correct status 
+then paste the metadata into the
 box and click the import button. The input is then validated and saved
 to the database.
 
