@@ -1,10 +1,14 @@
 package controllers;
 
+import play.Logger;
 import play.data.Form;
 import play.mvc.*;
 import models.*;
 import play.data.FormFactory;
+import play.data.validation.ValidationError;
+
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -52,7 +56,30 @@ public class LoadController extends Controller {
           String fileName = filename.getFilename();
           java.io.File file = filename.getFile();
        	  InputCSVParser inputCSV = new InputCSVParser(form,file);
-   		  EntityManager em = jpaApi.em();  
+   		  EntityManager em = jpaApi.em(); 
+			
+   		  DataResource testdrs = em.find(DataResource.class, id);
+			if (testdrs != null){
+					Logger.error("dataset " + id + " already exists");
+			    	 ValidationError e = new ValidationError("id", "dataset " + id + " already exists",new ArrayList());
+			    	 ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
+			    	 errors.add(e);
+			    	 dsForm.errors().put("id",errors);
+			    	 
+			    	 ValidationError g = new ValidationError("", "ERROR",new ArrayList());
+			    	 ArrayList<ValidationError> gerrors = new ArrayList<ValidationError>();
+			    	 gerrors.add(g);
+			    	 dsForm.errors().put("",gerrors);
+			    	 
+			 	  //  @for(error <- dsForm("id").errors) {
+			 	   // 	<p>@Messages(error.messages, error.arguments.toArray: _*)</p>
+			 		//	}
+			    	// regionForm.fill(region)
+			    	 // .withGlobalError("Your error message")))
+			    	 
+		    	//   return badRequest(views.html.load.render(dsForm.fill(form)));
+		    	   return badRequest(views.html.load.render(dsForm));
+			}
    		  DataResource drs = new DataResource();
    		  drs.setDataResource(id);
    		  drs.setTitle(title);   		
@@ -60,7 +87,9 @@ public class LoadController extends Controller {
    		  dds.setDataResourceBean(drs);
    		  dds.setTitle(title);
    		  em.persist(drs);
-   		  em.persist(dds);   
+   		  em.persist(dds);
+       	  em.flush();
+       	  em.clear();
        	  inputCSV.runJPA(em, dds);
        	  em.flush();
        	  em.clear();

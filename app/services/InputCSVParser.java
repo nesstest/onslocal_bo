@@ -121,7 +121,7 @@ public class InputCSVParser implements Runnable {
 			dds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading of observations into staging was not successful for Job %s : %s", jobId, loadException ));
 		} finally {
-			em.persist(dds);
+			em.merge(dds);
 		}
 	}
 	
@@ -215,6 +215,11 @@ public class InputCSVParser implements Runnable {
 						}
 						// Increment the number of rows found
 						rowCount++;
+						if (rowCount % 1000 == 0){
+							logger.info("records processed = " +rowCount);
+							em.flush();
+							em.clear();
+						}
 						// Validate the row
 						validate(rowData, rowCount);
 						StageDimensionalDataPoint stageObs = new StageDimensionalDataPoint();

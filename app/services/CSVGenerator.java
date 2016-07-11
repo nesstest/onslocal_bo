@@ -40,6 +40,7 @@ public class CSVGenerator implements Runnable {
 	EntityManager em;
 	DimensionalDataSet dds;
 	String outFile;
+	// sort by numeric area id or extcode (levels?)
 	private static String VARIABLE_VALUE_QUERY = "SELECT ga.geographic_area_id, ga.ext_code, ga.name AS area_name, ga.geographic_level_type, ti.time_period_id, ti.name AS time_name, v.variable_id, v.value_domain," +
 			 " v.unit_type, v.name AS variable_name, d.value" +
 			 " FROM onslocal_data_bo.geographic_area ga, onslocal_data_bo.time_period ti, onslocal_data_bo.dimensional_data_point d, onslocal_data_bo.variable v" +

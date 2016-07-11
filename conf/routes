@@ -6,17 +6,17 @@
 
 GET     /	                        controllers.HomeController.index
 
-GET     /load                       controllers.HomeController.load
+GET     /create                     controllers.HomeController.load
 
-POST    /load                       controllers.LoadController.processform
+POST    /create                     controllers.LoadController.processform
 
 GET     /metadata                   controllers.HomeController.metadata
 
 POST    /metadata                   controllers.MetadataController.processform
 
-POST    /edit                       controllers.EditController.processform
+POST    /load                       controllers.EditController.processform
 
-GET     /edit                       controllers.HomeController.edit
+GET     /load                       controllers.HomeController.edit
 
 POST    /generate                   controllers.GenerateController.processform
 

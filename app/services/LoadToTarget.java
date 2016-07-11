@@ -186,10 +186,10 @@ public class LoadToTarget implements Runnable {
 				}
 			}
 
-	//		no more than 30000 records allowed!
+	//		no more than 120000 records allowed!
 		//	int noofchunks = 1;
 		//	int totalrecstoload = results.size();
-			int recstoload = 30000;
+			int recstoload = 120000;
 			int chunksize = 1000; 
 			if (results.size() < recstoload){
 				recstoload = results.size();
