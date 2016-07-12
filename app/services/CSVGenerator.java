@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 
@@ -65,6 +66,8 @@ public class CSVGenerator implements Runnable {
 	
 	public void run() {
 		logger.info(String.format("CSV Generation started for DDS Id: %s.", dds.getDimensionalDataSetId()));
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
 		try {
 			buildCSV();
 			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());

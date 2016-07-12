@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -37,6 +38,8 @@ public class GenerateController extends Controller {
     @Transactional
     public Result processform() {
     	Form<Generate> genForm = formFactory.form(Generate.class).bindFromRequest();
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
     	
    	if(genForm.hasErrors()) {
 		EntityManager em = jpaApi.em();
@@ -61,9 +64,9 @@ public class GenerateController extends Controller {
     	// Logger.info("size = " + dis.size());
     	DataResource drs = dis.get(0);
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();
-    	Logger.info("size2 = " + dimds.size());
+    //	Logger.info("size2 = " + dimds.size());
     	dimdsid = dimds.get(0).getDimensionalDataSetId();
-      	Logger.info("dimsd = " + dimdsid);
+      	Logger.info("Genarating CSV for DimensionalDataSet = " + dimdsid);
     	g1.setDimdsid(dimdsid);
     	CSVGenerator gen = new CSVGenerator(dsname);
 

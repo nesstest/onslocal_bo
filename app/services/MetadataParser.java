@@ -10,6 +10,7 @@ import models.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 // see http://guidance.data.gov.uk/dcat_fields.html
 public class MetadataParser implements Runnable {
@@ -32,7 +33,9 @@ public class MetadataParser implements Runnable {
 	@Override
 	public void run() {
 		logger.info(String.format("Metadata Loading started for dataset id " + dsName));
-    	List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", dsName).getResultList();
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
+		List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", dsName).getResultList();
     	// Logger.info("size = " + dis.size());
     	DataResource drs = dis.get(0);
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();

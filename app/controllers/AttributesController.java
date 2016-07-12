@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -77,7 +78,9 @@ public class AttributesController extends Controller {
 	
 	@Transactional
     public Result processform() {
-    	EntityManager em = jpaApi.em();
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
+		EntityManager em = jpaApi.em();
 		Form<Attribs> attForm = formFactory.form(Attribs.class);
     	Attribs a1 = attForm.bindFromRequest().get();
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dimensionalDataSetId = :dsid",DimensionalDataSet.class).setParameter("dsid", datasetdefid).getResultList();

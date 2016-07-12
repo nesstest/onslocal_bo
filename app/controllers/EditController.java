@@ -10,6 +10,7 @@ import play.data.FormFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -34,6 +35,8 @@ public class EditController extends Controller {
     @Transactional
     public Result processform() {
     	Form<Editor> editForm = formFactory.form(Editor.class).bindFromRequest();
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
     	
    	if(editForm.hasErrors()) {
 		EntityManager em = jpaApi.em();

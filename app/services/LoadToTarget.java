@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 // see http://guidance.data.gov.uk/dcat_fields.html
 public class LoadToTarget implements Runnable {
@@ -39,6 +40,8 @@ public class LoadToTarget implements Runnable {
 	@Override
 	public void run() {
 		logger.info(String.format("Loading to Target started for dataset id " + ddsid + " (" +dsname+")"));
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
 		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
 		try {
 			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());

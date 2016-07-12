@@ -4,6 +4,7 @@ import play.mvc.*;
 import models.*;
 import play.data.FormFactory;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -22,6 +23,8 @@ public class StatusController extends Controller {
     
     @Transactional
     public Result getDatasets(){
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
     	EntityManager em = jpaApi.em();
         List <DimensionalDataSet> gcet = em.createQuery("SELECT d FROM DimensionalDataSet d",DimensionalDataSet.class).getResultList();
         return ok(views.html.status.render(gcet));    

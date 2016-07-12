@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -97,7 +98,10 @@ public class InputCSVParser implements Runnable {
 	
 	@Override
 	public void run() {
-		logger.info(String.format("File loading started for the Job Id: %s.", jobId));
+		String resourceId = dds.getDataResourceBean().getDataResource();
+		logger.info(String.format("File loading started for dataset Id: %s.", resourceId));
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
 		try {
 			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 			dds.setModified(timeStamp);
@@ -107,19 +111,19 @@ public class InputCSVParser implements Runnable {
 			parseCSV();
 			this.dataset.setStatus("Loaded to staging");
 			dds.setStatus("1-Staging-OK");
-			logger.info(String.format("Observations successfully loaded for Job %s.", jobId));
+			logger.info(String.format("Observations successfully loaded for dataset %s.", resourceId));
 		} catch (CSVValidationException validationException) {
 			this.dataset.setStatus("Input file failed validation");
 			dds.setStatus("1-Staging-Failed");
 			dds.setValidationMessage(validationException.getMessage());
 			dds.setValidationException(validationException.getLocalizedMessage());
-			logger.info(String.format("Observations file failed validation for Job %s : %s", jobId, validationException ));
+			logger.info(String.format("Observations file failed validation for dataset %s : %s", resourceId, validationException ));
 		} catch (GLLoadException loadException) {
 			this.dataset.setStatus("Loading of observations failed");
 			dds.setStatus("1-Staging-Failed");
 			dds.setValidationException(loadException.getMessage());
 			dds.setLoadException(loadException.getMessage());
-			logger.info(String.format("Loading of observations into staging was not successful for Job %s : %s", jobId, loadException ));
+			logger.info(String.format("Loading of observations into staging was not successful for dataset %s : %s", resourceId, loadException ));
 		} finally {
 			em.merge(dds);
 		}

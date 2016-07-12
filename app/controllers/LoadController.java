@@ -9,6 +9,7 @@ import play.data.validation.ValidationError;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 import javax.inject.*;
 import javax.persistence.EntityManager;
@@ -38,9 +39,9 @@ public class LoadController extends Controller {
     @Transactional
     public Result processform() {
    	 
-
-    	
-    Form<Dataset> dsForm = formFactory.form(Dataset.class).bindFromRequest();
+    	TimeZone tz = TimeZone.getTimeZone("Europe/London");
+    	TimeZone.setDefault(tz);
+    	Form<Dataset> dsForm = formFactory.form(Dataset.class).bindFromRequest();
     	if(dsForm.hasErrors()) {
     	   return badRequest(views.html.load.render(dsForm));
     	} else {
