@@ -19,7 +19,7 @@
 	      
 	<div> 
     @form(action=routes.LogsController.showLog()) {
-       @textarea(field = logForm("logtext"), args = 'rows -> 30, 'class -> "inputs-wide", '_label -> "Log text")
+       @textarea(field = logForm("logtext"), args = 'rows -> 30, 'class -> "inputs-wide", '_label -> "Showing all application log entries since last deployment or restart")
     }
 
 	</div>

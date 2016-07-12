@@ -56,17 +56,15 @@ public class GenerateController extends Controller {
    	} else {
     	
     	Generate g1 = genForm.get();
-    
-    //	task = gen1.getTask();
     	dsname = g1.getDsname();
 		EntityManager em = jpaApi.em();
     	List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", dsname).getResultList();
     	// Logger.info("size = " + dis.size());
     	DataResource drs = dis.get(0);
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();
-    //	Logger.info("size2 = " + dimds.size());
+    	// Logger.info("size2 = " + dimds.size());
     	dimdsid = dimds.get(0).getDimensionalDataSetId();
-      	Logger.info("Genarating CSV for DimensionalDataSet = " + dimdsid);
+      	Logger.info("Genarating CSV for Dataset Resource ID = " + dsname);
     	g1.setDimdsid(dimdsid);
     	CSVGenerator gen = new CSVGenerator(dsname);
 
