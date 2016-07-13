@@ -236,6 +236,14 @@ public class InputCSVParser implements Runnable {
 							// Data marking
 							stageObs.setDataMarking(rowData[1]);
 						}
+						if (rowData[2] != null && rowData[2].trim().length() > 0) {
+							// Statistical Unit
+							stageObs.setUnitTypeEng(rowData[2]);
+						}
+						if (rowData[4] != null && rowData[4].trim().length() > 0) {
+							// Measure Type
+							stageObs.setValueDomainEng(rowData[4]);
+						}
 						if (rowData[6] != null && rowData[6].trim().length() > 0) {
 							// Observation type code
 				            stageObs.setObservationType(rowData[6].trim());

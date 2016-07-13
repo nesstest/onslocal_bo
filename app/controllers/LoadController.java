@@ -15,6 +15,7 @@ import javax.inject.*;
 import javax.persistence.EntityManager;
 
 import services.InputCSVParser;
+import services.LoadToTarget;
 import play.db.jpa.JPAApi;
 import play.db.jpa.Transactional;
 import play.twirl.api.Html;
@@ -24,6 +25,8 @@ import play.twirl.api.Html;
  * This controller contains an action to process the input file
  */
 public class LoadController extends Controller {
+	private static final Logger.ALogger logger = Logger.of(LoadController.class);
+	
 	@Inject 
 	FormFactory formFactory;
 	
@@ -71,14 +74,7 @@ public class LoadController extends Controller {
 			    	 ArrayList<ValidationError> gerrors = new ArrayList<ValidationError>();
 			    	 gerrors.add(g);
 			    	 dsForm.errors().put("",gerrors);
-			    	 
-			 	  //  @for(error <- dsForm("id").errors) {
-			 	   // 	<p>@Messages(error.messages, error.arguments.toArray: _*)</p>
-			 		//	}
-			    	// regionForm.fill(region)
-			    	 // .withGlobalError("Your error message")))
-			    	 
-		    	//   return badRequest(views.html.load.render(dsForm.fill(form)));
+
 		    	   return badRequest(views.html.load.render(dsForm));
 			}
    		  DataResource drs = new DataResource();

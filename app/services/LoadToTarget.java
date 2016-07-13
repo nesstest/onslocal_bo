@@ -17,17 +17,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-// see http://guidance.data.gov.uk/dcat_fields.html
 public class LoadToTarget implements Runnable {
-	  private static final Logger.ALogger logger = Logger.of(LoadToTarget.class);
+	private static final Logger.ALogger logger = Logger.of(LoadToTarget.class);
 	EntityManager em;
+	Editor ed1;
 	Long ddsid;
 	String dsname;
 	Boolean singlearea;
 	Boolean singletime;
 	Long recct;
 	String variableName;
+	
 	public LoadToTarget(Editor ed) {
+		this.ed1 = ed;
 		this.ddsid = ed.getDimdsid();
 		this.dsname = ed.getDsname();
 	}
@@ -46,28 +48,28 @@ public class LoadToTarget implements Runnable {
 		try {
 			String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 			ds.setModified(timeStamp);
-			//ds.setStatus("2-Target-Failed");
 			ds.setValidationMessage("");
 			ds.setValidationException("");
 			ds.setLoadException("");
 			em.merge(ds);
 			StageToTarget(ds);
-	//		em.flush();
-	//		em.clear();
 			logger.info("loaded " + recct + " records");
 			ds.setStatus("2-Target-OK");
 			ds.setObscount(recct);
 			logger.info(String.format("Load to Target successful"));
+			ed1.setStatus(" loaded OK: " + recct + " records" );
 		} catch (CSVValidationException validationException) {
 			ds.setStatus("2-Target-Failed");
 			ds.setValidationMessage(validationException.getMessage());
 			ds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("Loading to target not successful - " + validationException.getMessage() ));
+			ed1.setStatus(String.format("Loading to target not successful - " + validationException.getMessage() ));
 		} catch (GLLoadException loadException) {
 			ds.setStatus("2-Target-Failed");
 			ds.setValidationException(loadException.getMessage());
 			ds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading to target not successful - " +  loadException.getMessage() ));
+			ed1.setStatus(String.format("Loading to target not successful - " +  loadException.getMessage() ));
 		} finally {
 			em.merge(ds);
 			em.flush();
@@ -96,8 +98,7 @@ public class LoadToTarget implements Runnable {
 		singlearea = true;
 		singletime = true;
 		try {
-	//		DimensionalDataSet ds = em.find(DimensionalDataSet.class, ddsid);
-			
+		
 			List areas =  em.createQuery("SELECT distinct s.geographicArea FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
 			List times =  em.createQuery("SELECT distinct s.timePeriodCode FROM StageDimensionalDataPoint s WHERE s.dimensionalDataSetId = " +ddsid, StageDimensionalDataPoint.class).getResultList();
 		 	logger.info("area count = " + areas.size());
@@ -145,6 +146,29 @@ public class LoadToTarget implements Runnable {
 			logger.info("records found = " + results.size());
 			recct = 0L;
 			
+			StageDimensionalDataPoint isp = (StageDimensionalDataPoint)results.get(0);
+			
+			// set same type and domain for all records
+			
+			String utype = isp.getUnitTypeEng();
+			if (utype!= null && utype.trim().length() > 0){
+				ut = em.find(UnitType.class, utype);
+				if (ut == null){
+					ut = new UnitType();
+					ut.setUnitType(utype);
+					em.persist(ut);
+				}
+			}
+			String vdomain = isp.getValueDomainEng();			
+			if (vdomain!= null && vdomain.trim().length() > 0){
+				vd = em.find(ValueDomain.class, vdomain);
+				if (vd == null){
+					vd = new ValueDomain();
+					vd.setValueDomain(vdomain);
+					em.persist(vd);
+				}
+			}
+			
 	    	String extCode = (String)areas.get(0);
 			GeographicArea singlegeo = null;
 			if (singlearea){
@@ -189,10 +213,8 @@ public class LoadToTarget implements Runnable {
 				}
 			}
 
-	//		no more than 120000 records allowed!
-		//	int noofchunks = 1;
-		//	int totalrecstoload = results.size();
-			int recstoload = 120000;
+			//	no more than 5000000 records allowed!
+			int recstoload = 5000000;
 			int chunksize = 1000; 
 			if (results.size() < recstoload){
 				recstoload = results.size();
@@ -334,7 +356,6 @@ public class LoadToTarget implements Runnable {
 			//	logger.info("population found");
 				if (pop == null){
 					   pop = new Population();
-				//	   pop.setId(ppk);
 					   pop.setGeographicArea(geo);
 					   pop.setTimePeriod(tim);
 					   pop.setGeographicAreaExtCode(extCode);

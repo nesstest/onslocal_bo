@@ -1,5 +1,6 @@
 package controllers;
 
+import play.Logger;
 import play.data.Form;
 import play.mvc.*;
 import models.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import javax.inject.*;
 import javax.persistence.EntityManager;
 
+import services.LoadToTarget;
 import services.MetadataParser;
 import play.db.jpa.JPAApi;
 import play.db.jpa.Transactional;
@@ -22,6 +24,7 @@ import play.twirl.api.Html;
  * This controller contains an action to process the input file
  */
 public class MetadataController extends Controller {
+	private static final Logger.ALogger logger = Logger.of(MetadataController.class);
 	@Inject 
 	FormFactory formFactory;
 	
@@ -54,21 +57,12 @@ public class MetadataController extends Controller {
    		Metadata met1 = metaForm.get();
      	json = met1.getJson();
     	dsname = met1.getResourceId();
-    //	dimdsid = met1.getDimdsid();
+		met1.setStatus(" metdata loaded OK");
     	MetadataParser mp = new MetadataParser(met1);
 		EntityManager em = jpaApi.em();
-        mp.runJPA(em);
-				
-   // return ok(dsname + " " + dimdsid + " " + json );
-    //	 ValidationError e = new ValidationError("name", "dataset already exist",new ArrayList());
-    //	 ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
-    //	 errors.add(e);
-    //	 dsForm.errors().put("name",errors);
-    // 	Result badRequest = badRequest(views.html.load.render(dsForm));
-    //	return badRequest;
-   // 	return ok (ds1.getStatus());
-    
-    return ok(views.html.message.render(("Dataset " + dsname + " loaded"), Html.apply("<p>Dataset id: " + dsname + "</p>")));
+        mp.runJPA(em);		
+  
+    return ok(views.html.message.render(("Dataset " + dsname + met1.getStatus()), Html.apply("<p>Dataset id: " + dsname + "</p>")));
  }
     
     }

@@ -19,8 +19,10 @@ public class MetadataParser implements Runnable {
 	String dsName;
 	Long ddsid;
 	String jsonString;
+	Metadata met1;
 	
 	public MetadataParser(Metadata met) {
+		this.met1 = met;
 		this.dsName = met.getResourceId();
 	    this.jsonString = met.getJson();
 	}
@@ -53,16 +55,19 @@ public class MetadataParser implements Runnable {
 			ds.setModified(timeStamp);
 			ds.setStatus("4-Metadata-OK");
 			logger.info(String.format("JSON successfully loaded"));
+			met1.setStatus(" JSON metadata successfully loaded");
 		} catch (CSVValidationException validationException) {
 			ds.setStatus("4-Metadata-Failed");
 			ds.setValidationMessage(validationException.getMessage());
 			ds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("Metadata file failed validation - " + validationException.getMessage() ));
+			met1.setStatus(String.format("Metadata file failed validation - " + validationException.getMessage() ));
 		} catch (GLLoadException loadException) {
 			ds.setStatus("4-Metadata-Failed");
 			ds.setValidationException(loadException.getMessage());
 			ds.setLoadException(loadException.getMessage());
 			logger.info(String.format("Loading of metadata was not successful - ",  loadException ));
+			met1.setStatus(String.format("Loading of metadata was not successful - ",  loadException ));
 		} finally {
 			em.merge(ds);
 			em.flush();
