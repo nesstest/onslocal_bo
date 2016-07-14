@@ -27,7 +27,7 @@ import models.*;
 public class CSVGenerator implements Runnable {
 	public static final byte[] UTF8_BOM = new byte[] { -17, -69, -65 }; // Byte order marker helpful to Excel
 	/** The _logger. */
-    private static final Logger.ALogger logger = Logger.of(InputCSVParser.class);
+    private static final Logger.ALogger logger = Logger.of(CSVGenerator.class);
 	protected static final String COPYRIGHT = "(C) Crown Copyright";
 	protected static final String DOUBLE_QUOTE = "\"";
 	protected static final Character COMMA = ',';
@@ -41,6 +41,7 @@ public class CSVGenerator implements Runnable {
 	EntityManager em;
 	DimensionalDataSet dds;
 	String outFile;
+	Generate g1;
 	// sort by numeric area id or extcode (levels?)
 	private static String VARIABLE_VALUE_QUERY = "SELECT ga.geographic_area_id, ga.ext_code, ga.name AS area_name, ga.geographic_level_type, ti.time_period_id, ti.name AS time_name, v.variable_id, v.value_domain," +
 			 " v.unit_type, v.name AS variable_name, d.value" +
@@ -54,7 +55,8 @@ public class CSVGenerator implements Runnable {
 	 * @param language the language
 	 */
 
-	public CSVGenerator(String outfile)  {
+	public CSVGenerator(String outfile, Generate gen)  {
+		this.g1 = gen;
 		this.outFile = outfile;
 	}
 	
@@ -82,11 +84,13 @@ public class CSVGenerator implements Runnable {
 			dds.setValidationMessage(validationException.getMessage());
 			dds.setValidationException(validationException.getLocalizedMessage());
 			logger.info(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), validationException ));
+			g1.setStatus(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), validationException ));
 		} catch (GLLoadException loadException) {
 			dds.setStatus("5-Generate-Failed");
 			dds.setValidationException(loadException.getMessage());
 			dds.setLoadException(loadException.getMessage());
 			logger.info(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), loadException ));
+			g1.setStatus(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), loadException ));
 		} finally {
 			em.persist(dds);
 		}
@@ -104,9 +108,6 @@ public class CSVGenerator implements Runnable {
 		logger.info("records found = " + results.size());
 		writeHeader(results);
 		writeData(results);
-	//	output.endRow();
-	//	output.outputField(COPYRIGHT);
-	//	output.endRow();
 		output.close();
 		} catch (IOException e) {
 		logger.error("Failed to create the CSV: ", e);
@@ -239,10 +240,6 @@ public class CSVGenerator implements Runnable {
 		}
 		
 		public void outputNum(String contents) {
-		//	if (contents.length() > 0) {
-		//		contents = contents.replace(DOUBLE_QUOTE, DOUBLE_QUOTE + DOUBLE_QUOTE);
-		//		contents = DOUBLE_QUOTE + contents + DOUBLE_QUOTE;
-		//	}
 			if (!firstColumn) {
 				print(COMMA);
 			}

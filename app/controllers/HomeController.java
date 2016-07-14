@@ -42,7 +42,7 @@ public class HomeController extends Controller {
 	@Inject
 	JPAApi jpaApi;
 	
-    public Result load() {
+    public Result create() {
     	Form<Dataset> dsForm = formFactory.form(Dataset.class);
         return ok(views.html.load.render(dsForm));
      }
@@ -70,7 +70,7 @@ public class HomeController extends Controller {
     }
     
 	@Transactional
-    public Result edit() {
+    public Result loadTarget() {
 		EntityManager em = jpaApi.em();
     	Form<Editor> editForm = formFactory.form(Editor.class);
     	Editor ed1 = new Editor();

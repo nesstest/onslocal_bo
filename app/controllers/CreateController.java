@@ -24,8 +24,8 @@ import play.twirl.api.Html;
 /**
  * This controller contains an action to process the input file
  */
-public class LoadController extends Controller {
-	private static final Logger.ALogger logger = Logger.of(LoadController.class);
+public class CreateController extends Controller {
+	private static final Logger.ALogger logger = Logger.of(CreateController.class);
 	
 	@Inject 
 	FormFactory formFactory;

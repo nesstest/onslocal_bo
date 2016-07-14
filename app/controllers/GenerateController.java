@@ -66,24 +66,24 @@ public class GenerateController extends Controller {
     	dimdsid = dimds.get(0).getDimensionalDataSetId();
       	Logger.info("Genarating CSV for Dataset Resource ID = " + dsname);
     	g1.setDimdsid(dimdsid);
-    	CSVGenerator gen = new CSVGenerator(dsname);
+    	g1.setStatus("OK");
+    	CSVGenerator gen = new CSVGenerator(dsname, g1);
 
         gen.runJPA(em,dimds.get(0));
 	
-        response().setContentType("application/x-download");  
-        response().setHeader("Content-disposition","attachment; filename=" + dsname + ".csv"); 
-		File file = Play.application().getFile("/logs/" + dsname + ".csv");
-     //   return ok(new File("/logs/" + dsname + ".csv"));
-		return ok(file);
+        if (g1.getStatus().equals("OK")){
+        	response().setContentType("application/x-download");  
+        	response().setHeader("Content-disposition","attachment; filename=" + dsname + ".csv"); 
+        	File file = Play.application().getFile("/logs/" + dsname + ".csv");
+        	//   return ok(new File("/logs/" + dsname + ".csv"));
+        	return ok(file);
+        }
+        else
+        {
+        	return ok(views.html.message.render(("Dataset " + dsname + g1.getStatus()), Html.apply("<p>Dataset id: " + dsname + "</p>")));
+        }
    	 }		
-   // return ok(dsname + " " + dimdsid + " " + task );
-    //	 ValidationError e = new ValidationError("name", "dataset already exist",new ArrayList());
-    //	 ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
-    //	 errors.add(e);
-    //	 dsForm.errors().put("name",errors);
-    // 	Result badRequest = badRequest(views.html.load.render(dsForm));
-    //	return badRequest;
-   // 	return ok (ds1.getStatus());
+
     }
     
 }

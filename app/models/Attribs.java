@@ -7,6 +7,8 @@ public class Attribs {
 	private String column_concept;
 	private String row_concept;
 	private List<String> conceptList;
+	private String status;
+	
 	public String getColumn_concept() {
 		return column_concept;
 	}
@@ -30,6 +32,12 @@ public class Attribs {
 	}
 	public void setConceptList(List<String> conceptList) {
 		this.conceptList = conceptList;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

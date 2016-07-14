@@ -21,8 +21,8 @@ import play.db.jpa.Transactional;
 /**
  * This controller contains an action to process the input file
  */
-public class EditController extends Controller {
-	private static final Logger.ALogger logger = Logger.of(EditController.class);
+public class LoadTargetController extends Controller {
+	private static final Logger.ALogger logger = Logger.of(LoadTargetController.class);
 	
 	@Inject 
 	FormFactory formFactory;

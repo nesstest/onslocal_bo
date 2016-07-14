@@ -23,6 +23,7 @@ import play.db.jpa.Transactional;
  * This controller contains an action to process the input file
  */
 public class AttributesController extends Controller {
+	private static final Logger.ALogger logger = Logger.of(AttributesController.class);
 	@Inject 
 	FormFactory formFactory;
 
@@ -49,10 +50,8 @@ public class AttributesController extends Controller {
    // 	Logger.info("size2 = " + dimds.size());
     	datasetdefid = dimds.get(0).getDimensionalDataSetId();
     	ArrayList<String> conList = new ArrayList<String>();
-  //  	List <ConceptSystem> cons = em.createQuery("SELECT c FROM ConceptSystem c",ConceptSystem.class).getResultList();
-    
-    //  Join not working - incomplete load?	
-    	List <Category> cons = em.createQuery("SELECT c FROM Category c WHERE EXISTS "
+   
+      	List <Category> cons = em.createQuery("SELECT c FROM Category c WHERE EXISTS "
     			+ "(SELECT dds.dimensionalDataSetId FROM DimensionalDataSet dds JOIN dds.dimensionalDataPoints ddp "
     			+ "JOIN ddp.variable v JOIN v.categories cat WHERE ddp.variable.variableId = v.variableId "
     			+ "AND cat.categoryId = c.categoryId "
@@ -60,17 +59,14 @@ public class AttributesController extends Controller {
 
     	conList.add("Geographic Area");
     	conList.add("Time Period");
-   // 	conList.add("Variable");
     	
-    	Logger.info("cons = " + cons.size());
+    	Logger.info("concepts found = " + cons.size());
     	for (int i=0; i< cons.size(); i++){
     		String testString = cons.get(i).getConceptSystemBean().getConceptSystem();
     		if (!conList.contains(testString)){
     			conList.add(testString);
     		}
     		
-    //		conList.add(cons.get(i).getConceptSystemBean().getConceptSystem());
-    //		conList.add(cons.get(i).getConceptSystem());
     	}
     	a1.setConceptList(conList);
     	return ok(views.html.attribs.render(attForm.fill(a1),conList)); 
@@ -83,6 +79,7 @@ public class AttributesController extends Controller {
 		EntityManager em = jpaApi.em();
 		Form<Attribs> attForm = formFactory.form(Attribs.class);
     	Attribs a1 = attForm.bindFromRequest().get();
+    	a1.setStatus("Attributes updated OK");
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dimensionalDataSetId = :dsid",DimensionalDataSet.class).setParameter("dsid", datasetdefid).getResultList();
     	DimensionalDataSet ds = dimds.get(0);
     	try {
@@ -97,28 +94,20 @@ public class AttributesController extends Controller {
     		drs.setRowConcept(a1.getRow_concept());
     		drs.setColumnConcept(a1.getColumn_concept());
     		em.merge(drs);
-    	//	TimeHelper thelp = new TimeHelper();
-    	//	List <TimePeriod> times = em.createQuery("SELECT t FROM TimePeriod t",TimePeriod.class).getResultList();
-        //	for (int i=0; i< times.size(); i++){
-        //			TimePeriod tt = times.get(i);
-        //			String timeString = tt.getName();
-        //			tt.setStartDate(thelp.getStartDate(timeString));
-        //			tt.setEndDate(thelp.getEndDate(timeString));
-        //			em.merge(tt);
-        //	    	}
     	}
 	    catch (Exception e) {
 	    	e.printStackTrace();
 	//    	logger.error(String.format("Edit Attributes Failed " + e.getMessage() ));
 	    	ds.setStatus("3-Attributes-Failed");
 	    	ds.setValidationException(String.format("Edit Attributes Failed " + e.getMessage()));
-	}
+	        a1.setStatus(String.format("Edit Attributes Failed " + e.getMessage()));
+	    }
 	 finally {
 		em.merge(ds);
 		em.flush();
 		em.clear();
 	}
-		return ok(views.html.message.render(("Attributes updated"), Html.apply("<p>Column Concept: " + a1.getColumn_concept() + "<br/>Row Concept: " + a1.getRow_concept() + "</p>")));
+		return ok(views.html.message.render((a1.getStatus()), Html.apply("<p>Column Concept: " + a1.getColumn_concept() + "<br/>Row Concept: " + a1.getRow_concept() + "</p>")));
 
     }
     

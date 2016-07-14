@@ -10,7 +10,7 @@ public class Generate {
 	  private String dsname;
 	  private Long dimdsid;
 	  private String task;
-	    private String status;
+	  private String status;
 	  
 	public String getDsname() {
 		return dsname;
