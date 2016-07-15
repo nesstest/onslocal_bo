@@ -44,7 +44,7 @@ public class HomeController extends Controller {
 	
     public Result create() {
     	Form<Dataset> dsForm = formFactory.form(Dataset.class);
-        return ok(views.html.load.render(dsForm));
+        return ok(views.html.create.render(dsForm));
      }
     
     public Result publish() {
@@ -85,7 +85,7 @@ public class HomeController extends Controller {
     	Collections.sort(datasetList);
     	em.flush();
     	em.clear();
-        return ok(views.html.edit.render(editForm.fill(ed1),datasetList));
+        return ok(views.html.loadtarget.render(editForm.fill(ed1),datasetList));
     } 
     
 	@Transactional

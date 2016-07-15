@@ -51,7 +51,7 @@ public class LoadTargetController extends Controller {
     		Collections.sort(datasetList);
     		em.flush();
     		em.clear();
-    		return badRequest(views.html.edit.render(editForm,datasetList));
+    		return badRequest(views.html.loadtarget.render(editForm,datasetList));
     	} else {
     		Editor ed1 = editForm.get();
     		task = ed1.getTask();

@@ -46,7 +46,7 @@ public class CreateController extends Controller {
     	TimeZone.setDefault(tz);
     	Form<Dataset> dsForm = formFactory.form(Dataset.class).bindFromRequest();
     	if(dsForm.hasErrors()) {
-    	   return badRequest(views.html.load.render(dsForm));
+    	   return badRequest(views.html.create.render(dsForm));
     	} else {
     		
    	    play.mvc.Http.MultipartFormData<File> body = request().body().asMultipartFormData();
@@ -75,7 +75,7 @@ public class CreateController extends Controller {
 			    	 gerrors.add(g);
 			    	 dsForm.errors().put("",gerrors);
 
-		    	   return badRequest(views.html.load.render(dsForm));
+		    	   return badRequest(views.html.create.render(dsForm));
 			}
    		  DataResource drs = new DataResource();
    		  drs.setDataResource(id);
