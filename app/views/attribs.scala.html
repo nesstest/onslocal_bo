@@ -1,4 +1,4 @@
-@(attForm:Form[Attribs],conceptList: List[String])
+@(attForm:Form[Attribs],conceptList: List[String],taxList: List[String])
 
 @import helper._
 
@@ -25,6 +25,11 @@
   field = attForm("row_concept"),
   options = options(conceptList),
   '_label -> "Select Row Concept", '_class -> "form-field-pair", 'class -> "inputs"
+)
+	@select(
+  field = attForm("taxonomy"),
+  options = options(taxList),
+  '_label -> "Select Taxonomy", '_class -> "form-field-pair", 'class -> "inputs"
 )
 	   <div class="load"> 
 	     <button class="button" type="submit" style="margin-top:20px; line-height: 20px" id="Load">

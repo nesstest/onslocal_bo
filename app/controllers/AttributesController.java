@@ -43,6 +43,10 @@ public class AttributesController extends Controller {
     	Logger.info("datasetid = " + datasetid);
    // 	Logger.info("size = " + dis.size());
     	DataResource drs = dis.get(0);
+    	List<Taxonomy> tList = drs.getTaxonomies();
+    	if (tList !=null && !tList.isEmpty()){
+    		a1.setTaxonomy(tList.get(0).getTaxonomy());
+    	}
     	a1.setColumn_concept(drs.getColumnConcept());
     	a1.setRow_concept(drs.getRowConcept());
     	a1.setDataResource(datasetid);
@@ -69,7 +73,17 @@ public class AttributesController extends Controller {
     		
     	}
     	a1.setConceptList(conList);
-    	return ok(views.html.attribs.render(attForm.fill(a1),conList)); 
+    	List <Taxonomy> taxes = em.createNamedQuery("Taxonomy.findAll",Taxonomy.class).getResultList();
+    	ArrayList<String> taxList = new ArrayList<String>();
+    	for (int j=0; j< taxes.size(); j++){
+    		String testString = taxes.get(j).getTaxonomy();
+    		if (!taxList.contains(testString)){
+    			taxList.add(testString);
+    		}
+    		
+    	}
+    	
+    	return ok(views.html.attribs.render(attForm.fill(a1),conList,taxList)); 
 	}
 	
 	@Transactional
@@ -93,6 +107,10 @@ public class AttributesController extends Controller {
     		DataResource drs = dis.get(0);
     		drs.setRowConcept(a1.getRow_concept());
     		drs.setColumnConcept(a1.getColumn_concept());
+    		List<Taxonomy> tList = new ArrayList<Taxonomy>();
+    		Taxonomy taxi = em.find(Taxonomy.class, a1.getTaxonomy());
+    		tList.add(taxi);
+    		drs.setTaxonomies(tList);
     		em.merge(drs);
     	}
 	    catch (Exception e) {

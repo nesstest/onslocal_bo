@@ -86,4 +86,36 @@ public class GenerateController extends Controller {
 
     }
     
+    @Transactional
+    public Result download(String dsname){
+    	Generate g1 = new Generate();
+    	g1.setDsname(dsname);
+		EntityManager em = jpaApi.em();
+    	List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", dsname).getResultList();
+    	// Logger.info("size = " + dis.size());
+    	DataResource drs = dis.get(0);
+    	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();
+    	// Logger.info("size2 = " + dimds.size());
+    	dimdsid = dimds.get(0).getDimensionalDataSetId();
+      	Logger.info("Genarating CSV for Dataset Resource ID = " + dsname);
+    	g1.setDimdsid(dimdsid);
+    	g1.setStatus("OK");
+    	CSVGenerator gen = new CSVGenerator(dsname, g1);
+
+        gen.runJPA(em,dimds.get(0));
+	
+        if (g1.getStatus().equals("OK")){
+        	response().setContentType("application/x-download");  
+        	response().setHeader("Content-disposition","attachment; filename=" + dsname + ".csv"); 
+        	File file = Play.application().getFile("/logs/" + dsname + ".csv");
+        	//   return ok(new File("/logs/" + dsname + ".csv"));
+        	return ok(file);
+        }
+        else
+        {
+        	return ok(views.html.message.render(("Dataset " + dsname + g1.getStatus()), Html.apply("<p>Dataset id: " + dsname + "</p>")));
+        }
+    	
+    }
+    
 }

@@ -8,6 +8,7 @@ public class Attribs {
 	private String row_concept;
 	private List<String> conceptList;
 	private String status;
+	private String taxonomy;
 	
 	public String getColumn_concept() {
 		return column_concept;
@@ -38,6 +39,12 @@ public class Attribs {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getTaxonomy() {
+		return taxonomy;
+	}
+	public void setTaxonomy(String taxonomy) {
+		this.taxonomy = taxonomy;
 	}
 	
 }

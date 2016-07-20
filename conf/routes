@@ -22,6 +22,8 @@ POST    /generate                   controllers.GenerateController.processform
 
 GET     /generate                   controllers.HomeController.generate
 
+GET     /generate/:dsname           controllers.GenerateController.download(dsname: String)
+
 POST    /editattribs                controllers.EditAttribsController.processform
 
 GET     /editattribs                controllers.HomeController.editattribs
