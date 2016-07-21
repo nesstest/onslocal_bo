@@ -63,14 +63,55 @@ public class GenerateController extends Controller {
     	DataResource drs = dis.get(0);
     	List <DimensionalDataSet> dimds = em.createQuery("SELECT d FROM DimensionalDataSet d WHERE d.dataResourceBean = :dsid",DimensionalDataSet.class).setParameter("dsid", drs).getResultList();
     	// Logger.info("size2 = " + dimds.size());
-    	dimdsid = dimds.get(0).getDimensionalDataSetId();
+    	DimensionalDataSet dds = dimds.get(0);
+    	dimdsid = dds.getDimensionalDataSetId();
       	Logger.info("Genarating CSV for Dataset Resource ID = " + dsname);
     	g1.setDimdsid(dimdsid);
     	g1.setStatus("OK");
+    	List <Presentation> pressies = em.createQuery("SELECT p FROM Presentation p WHERE p.dimensionalDataSet = :dsid",Presentation.class).setParameter("dsid", dds).getResultList();
+    	if (pressies.isEmpty())
+    	{
+			PresentationType pt1 = em.find(PresentationType.class, "CSV");
+			if (pt1 == null){
+			   pt1 = new PresentationType();
+			   pt1.setPresentationType("CSV");
+			   em.persist(pt1);
+			}
+			PresentationType pt2 = em.find(PresentationType.class, "XLS");
+			if (pt2 == null){
+			   pt2 = new PresentationType();
+			   pt2.setPresentationType("XLS");
+			   em.persist(pt1);
+			}
+    		// create presentation object
+			String bees = "Some bees";
+			byte [] mrblobby = bees.getBytes();
+    		String filename = drs.getDataResource() + " " + drs.getTitle();
+    		String url = "http://ec2-52-40-142-234.us-west-2.compute.amazonaws.com/generate/" + drs.getDataResource();
+    		Presentation pres1 = new Presentation();
+    		pres1.setFileName(filename);
+    		pres1.setDownloadurl(url);
+    		pres1.setDimensionalDataSet(dds);
+    		pres1.setFileSize(1000L);
+    		pres1.setFileData(mrblobby);
+    		pres1.setPresentationTypeBean(pt1);
+    		em.persist(pres1);
+    		Presentation pres2 = new Presentation();
+    		pres2.setFileName(filename);
+    		pres2.setDownloadurl(url);
+    		pres2.setDimensionalDataSet(dds);
+    		pres2.setFileSize(1000L);
+    		pres2.setFileData(mrblobby);
+    		pres2.setPresentationTypeBean(pt2);
+    		em.persist(pres2);
+    	}
+    	
     	CSVGenerator gen = new CSVGenerator(dsname, g1);
 
         gen.runJPA(em,dimds.get(0));
-	
+    	em.flush();
+    	em.clear();
+    	
         if (g1.getStatus().equals("OK")){
         	response().setContentType("application/x-download");  
         	response().setHeader("Content-disposition","attachment; filename=" + dsname + ".csv"); 

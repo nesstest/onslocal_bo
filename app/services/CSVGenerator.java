@@ -92,7 +92,7 @@ public class CSVGenerator implements Runnable {
 			logger.info(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), loadException ));
 			g1.setStatus(String.format("CSV Generation failed for DDS Id: %s : %s", dds.getDimensionalDataSetId(), loadException ));
 		} finally {
-			em.persist(dds);
+			em.merge(dds);
 		}
 	}
 	

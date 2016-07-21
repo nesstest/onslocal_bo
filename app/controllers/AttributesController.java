@@ -125,7 +125,7 @@ public class AttributesController extends Controller {
 		em.flush();
 		em.clear();
 	}
-		return ok(views.html.message.render((a1.getStatus()), Html.apply("<p>Column Concept: " + a1.getColumn_concept() + "<br/>Row Concept: " + a1.getRow_concept() + "</p>")));
+		return ok(views.html.message.render((a1.getStatus()), Html.apply("<p>Column Concept: " + a1.getColumn_concept() + "<br/>Row Concept: " + a1.getRow_concept() + "<br/>Taxonomy Node: " + a1.getTaxonomy() + "</p>")));
 
     }
     
