@@ -16,9 +16,7 @@ but not that much was directly usable (and obviously not any of the
 Talend ETL scripts).
 
 The workflow is simplistic (see status screen) and there is no delete or
-replace functionality. Publishing has not been implemented but Play does
-allow the controllers to be exposed as a web service, so Florence could
-make requests over HTTP.
+replace functionality. Publishing has not been implemented but can be simulated by changing the database connection the API the web front end uses to point at the BO schema. Note also that Play does allow controller actions to be exposed as a web service, e.g. /generate/POPTEST1 returns a CSV file. This is a way the new website's publication system could make requests over HTTP.
 
 The code is stored in GitHub and the application is deployed to AWS
 (currently a manual process). The access rules in AWS only allow access
@@ -37,7 +35,7 @@ data is then easily accessible via SQL in the next step (load to
 target).
 
 The input file must be in the current WDA input format as produced by
-DataBaker. In future we would expect this format to be
+DataBaker. In future we expect this format to be
 simplified and tidied up (the WDA one has a lot of baggage).
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image2.png "Screen shot")
@@ -70,7 +68,7 @@ not attempt to create new ones (error if area not present).
 
 Time Periods - in this case we have not precreated any so we don't know
 if the incoming ones will be new or already existing, so have to cope
-with both.
+with both (a helper class works out the start and end dates).
 
 Note that there is a check made for there being only one area or only
 one time at the start. Geography and Time values are used to populate
@@ -88,8 +86,7 @@ Finally, armed with all the above for a single record, the observation
 can be saved.
 
 This is not an efficient way to load the data and performance is not
-good. To make this run fast enough for large datasets a lot of work is
-required.
+good (about 2,000 cells per minute). This is OK for the Alpha but a more efficient solution will be needed for the Beta which must cope with datasets with millions of cells.
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image3.png "Screen shot")
 
@@ -102,9 +99,10 @@ database errors which result in a rollback are not captured - to be fixed).
 
 In the WDA back office there is a lot of customisation and tweaking that
 you can do to the datasets before document generation and publication.
-For the Alpha we decided to only implement a single function, this being
-the specification of what goes in the row and what in the column when
+For the Alpha we decided to only implement two functions: 
+1) The specification of what goes in the row and what in the column when
 displaying the table in the FO.
+2) Associating the dataset with one taxonomy node (needed for search in FO).
 
 Missing from here is measurement units, statistical units and
 multipliers which are usually not specified on the WDA input files, so
@@ -113,8 +111,7 @@ input file, and if this is blank you get Persons and Count by default.
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image4.png "Screen shot")
 
-The user is presented with the options "Geographic Area", "Time Period" and all 
-the concepts (equivalent to topic dimensions) used on the current dataset.
+For the row and column dimensions, the user is presented with the options "Geographic Area", "Time Period" and all the concepts (equivalent to topic dimensions) used on the current dataset. For the taxonomy, a drop-down is driven by the taxonomy table. For all three lists the current setting (if any) is selected on page load.
 
 **Step 4 - Load Metadata**
 
@@ -158,8 +155,9 @@ The rows are area by time (times nested within areas) so this works for
 all types of data. The column is the variable (not broken up into nested
 categories).
 
-Time Periods are sorted alphabetically rather than chronologically (intending to
-fix this).
+Time Periods are now sorted chronologically, but there is still a problem with sparsity. Datasets with zeroes or missing values work but those with no cell at all for certain combinations result in an incorrect output file.
+
+As a by-product of the generation process, the presentation table is update to make the downloads work on the FO, though these are in fact service calls to the BO to generate the CSV on-they-fly. This is necessary because the system does not permanently store the generated files. 
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image6.png "Screen shot")
 
@@ -169,9 +167,7 @@ Excel) or save to a local file.
 
 **Step 6 - Publish Dataset**
 
-Publishing is out of scope for the Alpha but we hope to fake it but
-pointing the FO API to the BO database, and check that the datasets
-work.
+Publishing is out of scope for the Alpha but we have faked it by pointing the FO API to the BO database, and (following a few tweaks) the datasets do work.
 
 ![alt text](https://raw.githubusercontent.com/nesstest/onslocal_bo/master/public/images/image7.png "Screen shot")
 
@@ -200,7 +196,7 @@ Updated are self-explanatory.
 
 This value is saved to the dataset when load to target is successful. It
 is the actual number loaded which may not be all the staging records
-(during the initial testing there is a limit of 1000 cells).
+(e.g. during the initial testing there was a cell limit in operation).
 
 *Error Messages*
 
@@ -223,5 +219,7 @@ failures occur.
 Currently, the log grows continuously until the application is restarted
 or redeployed, there is no option to show (say) only today's logs or a
 particular level of logging (e.g. errors only, info only).
+
+Logs are now set to UK time (the screen shot was taken when they showed the time in Western USA where the AWS host server resides).
 
 
