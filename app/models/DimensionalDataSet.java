@@ -75,6 +75,16 @@ public class DimensionalDataSet implements Serializable {
 	@Column(name="validation_message")
 	private String validationMessage;
 
+	private String source;
+
+	private String contact;
+
+	@Column(name = "release_date")
+	private String releaseDate;
+
+	@Column(name = "next_release")
+	private String nextRelease;
+	
 	//bi-directional many-to-one association to DimensionalDataPoint
 	@OneToMany(mappedBy="dimensionalDataSet")
 	private List<DimensionalDataPoint> dimensionalDataPoints;
@@ -289,6 +299,46 @@ public class DimensionalDataSet implements Serializable {
 
 	public void setValidationMessage(String validationMessage) {
 		this.validationMessage = validationMessage;
+	}
+	
+	public String getSource()
+	{
+		return source;
+	}
+
+	public void setSource(String source)
+	{
+		this.source = source;
+	}
+
+	public String getContact()
+	{
+		return contact;
+	}
+
+	public void setContact(String contact)
+	{
+		this.contact = contact;
+	}
+
+	public String getReleaseDate()
+	{
+		return releaseDate;
+	}
+
+	public void setReleaseDate(String releaseDate)
+	{
+		this.releaseDate = releaseDate;
+	}
+
+	public String getNextRelease()
+	{
+		return nextRelease;
+	}
+
+	public void setNextRelease(String nextRelease)
+	{
+		this.nextRelease = nextRelease;
 	}
 
 	public List<DimensionalDataPoint> getDimensionalDataPoints() {

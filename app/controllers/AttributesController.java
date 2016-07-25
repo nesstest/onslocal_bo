@@ -103,6 +103,10 @@ public class AttributesController extends Controller {
 			ds.setLoadException("");
 			ds.setValidationMessage("Success");
         	ds.setStatus("3-Attributes-OK");
+        	ds.setSource("ONS");
+        	ds.setContact("Darren Barnes");
+        	ds.setReleaseDate("Christmas");
+        	ds.setNextRelease("Easter");
     		List <DataResource> dis = em.createQuery("SELECT d FROM DataResource d WHERE d.dataResource = :dsid",DataResource.class).setParameter("dsid", datasetid).getResultList();
     		DataResource drs = dis.get(0);
     		drs.setRowConcept(a1.getRow_concept());
